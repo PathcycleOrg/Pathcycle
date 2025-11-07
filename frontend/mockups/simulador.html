@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Escenarios - PathCycle</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Estilo de fuente base como respaldo -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Estilos para el Toggle Switch (por si se usa) */
+        .toggle-checkbox:checked {
+            @apply: bg-pathcycle-primary border-pathcycle-primary;
+            right: 0;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            @apply: bg-pathcycle-primary;
+        }
+    </style>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Configuración personalizada de Tailwind (Método de Objeto JS) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        /* Paleta de colores de la guía de estilo */
+                        'pathcycle-primary': '#0891B2',   /* Deep teal/cyan */
+                        'pathcycle-secondary': '#10B981', /* Vibrant green */
+                        'pathcycle-accent': '#F59E0B',    /* Amber */
+                        'pathcycle-danger': '#EF4444',    /* Red */
+                        'pathcycle-sidebar': '#0F766E',   /* Dark teal (específico del dashboard) */
+                        'pathcycle-gray': {
+                            50: '#F8FAFC',   /* Light gray panels */
+                            100: '#E2E8F0',
+                            200: '#CBD5E1',
+                            400: '#64748B',
+                            800: '#1E293B',
+                        },
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    },
+                    borderRadius: {
+                        /* 8px border radius */
+                        'lg': '8px',
+                    },
+                    boxShadow: {
+                        /* Subtle shadows */
+                        'sm': '0 1px 3px rgba(0,0,0,0.1)',
+                    }
+                }
+            }
+        }
+    </script>
+    
+</head>
+<body class="bg-pathcycle-gray-50 text-pathcycle-gray-800 font-sans antialiased">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- INICIO: Sidebar Izquierdo -->
+        <aside class="w-60 bg-pathcycle-sidebar text-white flex flex-col flex-shrink-0">
+            
+            <!-- Logo -->
+            <div class="h-16 flex items-center justify-center px-4 gap-2 border-b border-white/10">
+                <i data-lucide="bike" class="w-7 h-7"></i>
+                <span class="text-2xl font-bold tracking-tight">PathCycle</span>
+            </div>
+            
+            <!-- Menú de Navegación -->
+            <nav class="flex-1 p-4 space-y-2">
+                <ul class="space-y-1">
+                    <!-- Dashboard -->
+                    <li>
+                        <a href="index.html" class="flex items-center gap-3 p-3 rounded-lg text-white/70 hover:bg-white/10 hover:text-white font-medium transition-colors">
+                            <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <!-- Analsis de Red -->
+                    <li>
+                        <a href="analisis-red.html" class="flex items-center gap-3 p-3 rounded-lg text-white/70 hover:bg-white/10 hover:text-white font-medium transition-colors">
+                            <i data-lucide="map" class="w-5 h-5"></i>
+                            <span>Análisis de Red</span>
+                        </a>
+                    </li>
+                    <!-- Simulador -->
+                    <li>
+                        <a href="simulador.html" class="flex items-center gap-3 p-3 rounded-lg bg-white/20 text-white font-medium">
+                            <i data-lucide="rotate-cw" class="w-5 h-5"></i>
+                            <span>Simulador</span>
+                        </a>
+                    </li>
+                    <!-- Reportes -->
+                    <li>
+                        <a href="reportes.html" class="flex items-center gap-3 p-3 rounded-lg text-white/70 hover:bg-white/10 hover:text-white font-medium transition-colors">
+                            <i data-lucide="file-text" class="w-5 h-5"></i>
+                            <span>Reportes</span>
+                        </a>
+                    </li>
+                    <!-- Ruta Óptima -->
+                    <li>
+                        <a href="ruta-optima.html" class="flex items-center gap-3 p-3 rounded-lg text-white/70 hover:bg-white/10 hover:text-white font-medium transition-colors">
+                            <i data-lucide="route" class="w-5 h-5"></i>
+                            <span>Ruta Óptima</span>
+                        </a>
+                    </li>
+                    <!-- Configuración -->
+                    <li>
+                        <a href="configuracion.html" class="flex items-center gap-3 p-3 rounded-lg text-white/70 hover:bg-white/10 hover:text-white font-medium transition-colors">
+                            <i data-lucide="settings" class="w-5 h-5"></i>
+                            <span>Configuración</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <!-- Perfil de Usuario -->
+            <div class="p-4 border-t border-white/10">
+                <div class="flex items-center gap-3">
+                    <img src="https://placehold.co/40x40/E2E8F0/64748B?text=UP" class="w-10 h-10 rounded-full" alt="User Avatar">
+                    <div>
+                        <p class="text-sm font-medium">Usuario Planificador</p>
+                        <p class="text-xs text-white/70">Municipalidad de Lima</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+        <!-- FIN: Sidebar Izquierdo -->
+
+        <!-- INICIO: Wrapper de Contenido Principal -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            
+            <!-- INICIO: Barra Superior (PROMPT 4 - Breadcrumb actualizado) -->
+            <header class="bg-white border-b border-pathcycle-gray-100 h-16 flex-shrink-0 flex items-center justify-between px-6">
+                
+                <!-- Breadcrumb -->
+                <div>
+                    <span class="text-sm text-pathcycle-gray-400">Dashboard /</span>
+                    <span class="text-sm font-medium text-pathcycle-gray-800">Simulador de Escenarios</span>
+                </div>
+                
+                <!-- Barra de Búsqueda -->
+                <div class="w-full max-w-sm relative">
+                    <input type="text" placeholder="Buscar escenario, propuesta..." class="w-full pl-10 pr-4 py-2 text-sm bg-pathcycle-gray-50 border border-pathcycle-gray-200 rounded-lg focus:ring-2 focus:ring-pathcycle-primary/50 focus:border-pathcycle-primary outline-none">
+                    <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-pathcycle-gray-400"></i>
+                </div>
+                
+                <!-- Iconos y Menú de Usuario -->
+                <div class="flex items-center gap-4">
+                    <button class="relative text-pathcycle-gray-400 hover:text-pathcycle-gray-800 transition-colors">
+                        <i data-lucide="bell" class="w-5 h-5"></i>
+                        <span class="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-pathcycle-danger ring-1 ring-white"></span>
+                    </button>
+                    
+                    <button class="flex items-center gap-2">
+                        <img src="https://placehold.co/32x32/E2E8F0/64748B?text=UP" class="w-8 h-8 rounded-full" alt="User Avatar">
+                        <span class="hidden md:block text-sm font-medium">Usuario...</span>
+                        <i data-lucide="chevron-down" class="w-4 h-4 text-pathcycle-gray-400"></i>
+                    </button>
+                </div>
+            </header>
+            <!-- FIN: Barra Superior -->
+
+            <!-- INICIO: Área de Contenido Principal (PROMPT 4) -->
+            <main class="flex-1 overflow-y-auto p-6 space-y-6">
+                
+                <!-- INICIO: Sección Superior (Título) -->
+                <div>
+                    <h1 class="text-2xl font-bold text-pathcycle-gray-800">Simulador de Expansión de Red Ciclista</h1>
+                    <p class="text-pathcycle-gray-400">Compare escenarios de inversión y evalúe su impacto algorítmico</p>
+                </div>
+                <!-- FIN: Sección Superior -->
+                
+                <!-- INICIO: Layout 50/50 (Comparación) -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    
+                    <!-- Lado Izquierdo: Escenario Actual -->
+                    <div class="bg-white rounded-lg shadow-sm border border-pathcycle-gray-100 flex flex-col">
+                        <!-- Header Gris -->
+                        <div class="h-12 flex items-center px-4 bg-pathcycle-gray-100 rounded-t-lg border-b border-pathcycle-gray-200">
+                            <h2 class="font-bold text-pathcycle-gray-800">Red Existente - Octubre 2025</h2>
+                        </div>
+                        <!-- Mapa + Métricas -->
+                        <div class="flex-1 relative min-h-[450px]">
+                            <!-- Placeholder del Mapa -->
+                            <div class="flex items-center justify-center h-full bg-pathcycle-gray-50 text-pathcycle-gray-400">
+                                [Mapa de Red Actual]
+                            </div>
+                            <!-- Panel de Métricas (Overlay) -->
+                            <div class="absolute bottom-4 left-4 right-4 bg-white/80 backdrop-blur-sm p-4 rounded-lg shadow-md border border-pathcycle-gray-100 space-y-2">
+                                <h3 class="font-bold text-sm mb-1 uppercase">Métricas Actuales</h3>
+                                <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+                                    <li>Componentes conexas: <span class="font-medium float-right">47</span></li>
+                                    <li>Conectividad: <span class="font-medium float-right">78%</span></li>
+                                    <li>Cobertura poblacional: <span class="font-medium float-right">2.1M</span></li>
+                                    <li>Inversión total: <span class="font-medium float-right">S/156M</span></li>
+                                </div>
+                                <div class="border-t border-pathcycle-gray-200 pt-2">
+                                    Estado: <span class="font-medium text-pathcycle-accent float-right">⚠️ Fragmentado</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Lado Derecho: Escenario Propuesto -->
+                    <div class="bg-white rounded-lg shadow-sm border-2 border-pathcycle-primary flex flex-col">
+                        <!-- Header Teal -->
+                        <div class="h-12 flex items-center justify-between px-4 bg-pathcycle-primary/10 text-pathcycle-primary rounded-t-lg border-b border-pathcycle-primary/20">
+                            <h2 class="font-bold">Propuesta de Expansión</h2>
+                            <button class="text-pathcycle-primary hover:text-opacity-70">
+                                <i data-lucide="pencil" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                        <!-- Mapa + Herramientas + Métricas -->
+                        <div class="flex-1 relative min-h-[450px]">
+                            <!-- Panel de Herramientas (Flotante) -->
+                            <div class="absolute top-4 left-4 z-10 flex flex-col gap-1 bg-white rounded-lg shadow-md border border-pathcycle-gray-100">
+                                <button title="Dibujar nueva ciclovía" class="w-9 h-9 flex items-center justify-center text-pathcycle-primary border-b border-pathcycle-gray-100 rounded-t-lg hover:bg-pathcycle-primary/5">
+                                    <i data-lucide="pencil" class="w-5 h-5"></i>
+                                </button>
+                                <button title="Eliminar propuesta" class="w-9 h-9 flex items-center justify-center text-pathcycle-gray-400 hover:text-pathcycle-danger hover:bg-pathcycle-danger/5 border-b border-pathcycle-gray-100">
+                                    <i data-lucide="eraser" class="w-5 h-5"></i>
+                                </button>
+                                <button title="Conexión directa" class="w-9 h-9 flex items-center justify-center text-pathcycle-gray-400 hover:text-pathcycle-gray-800 hover:bg-pathcycle-gray-50 border-b border-pathcycle-gray-100">
+                                    <i data-lucide="move-horizontal" class="w-5 h-5"></i>
+                                </button>
+                                <button title="Deshacer" class="w-9 h-9 flex items-center justify-center text-pathcycle-gray-400 hover:text-pathcycle-gray-800 hover:bg-pathcycle-gray-50 border-b border-pathcycle-gray-100">
+                                    <i data-lucide="undo-2" class="w-5 h-5"></i>
+                                </button>
+                                <button title="Rehacer" class="w-9 h-9 flex items-center justify-center text-pathcycle-gray-400 hover:text-pathcycle-gray-800 hover:bg-pathcycle-gray-50 rounded-b-lg">
+                                    <i data-lucide="redo-2" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+                            <!-- Placeholder del Mapa -->
+                            <div class="flex items-center justify-center h-full bg-pathcycle-gray-50 text-pathcycle-gray-400">
+                                [Mapa de Red Propuesta + Líneas Azules]
+                            </div>
+                            <!-- Panel de Métricas (Overlay) -->
+                            <div class="absolute bottom-4 left-4 right-4 bg-white/80 backdrop-blur-sm p-4 rounded-lg shadow-md border border-pathcycle-gray-100 space-y-2">
+                                <h3 class="font-bold text-sm mb-1 uppercase text-pathcycle-primary">Métricas Propuestas</h3>
+                                <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+                                    <li>Componentes: <span class="font-medium float-right">12 <span class="text-green-600">(<i data-lucide="arrow-down" class="inline w-3 h-3"></i> -35)</span></span></li>
+                                    <li>Conectividad: <span class="font-medium float-right">95% <span class="text-green-600">(<i data-lucide="arrow-up" class="inline w-3 h-3"></i> +17%)</span></span></li>
+                                    <li>Cobertura: <span class="font-medium float-right">3.8M <span class="text-green-600">(<i data-lucide="arrow-up" class="inline w-3 h-3"></i> +1.7M)</span></span></li>
+                                    <li>Inversión: <span class="font-medium float-right">S/179M (+S/23M)</span></li>
+                                </div>
+                                <div class="border-t border-pathcycle-gray-200 pt-2 grid grid-cols-2">
+                                    <li>Estado: <span class="font-medium text-green-600 float-right">✅ Conectado</span></li>
+                                    <li>ROI Estimado: <span class="font-medium text-pathcycle-accent float-right">⭐⭐⭐⭐⭐</span></li>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- FIN: Layout 50/50 -->
+                
+                <!-- INICIO: Sección Inferior (Análisis de Impacto) -->
+                <div class="bg-white rounded-lg shadow-sm border border-pathcycle-gray-100">
+                    <!-- Header con Título y Tabs -->
+                    <div class="flex justify-between items-center border-b border-pathcycle-gray-100">
+                        <!-- Tabs -->
+                        <div class="flex items-baseline">
+                            <h2 class="text-base font-bold text-pathcycle-gray-800 p-4 mr-2 uppercase">Análisis de Impacto</h2>
+                            <button class="py-4 px-3 border-b-2 border-pathcycle-primary text-sm font-medium text-pathcycle-primary">
+                                Conectividad
+                            </button>
+                            <button class="py-4 px-3 border-b-2 border-transparent text-sm font-medium text-pathcycle-gray-400 hover:text-pathcycle-gray-800 hover:border-pathcycle-gray-200 transition-all">
+                                Población beneficiada
+                            </button>
+                            <button class="py-4 px-3 border-b-2 border-transparent text-sm font-medium text-pathcycle-gray-400 hover:text-pathcycle-gray-800 hover:border-pathcycle-gray-200 transition-all">
+                                Costo-beneficio
+                            </button>
+                            <button class="py-4 px-3 border-b-2 border-transparent text-sm font-medium text-pathcycle-gray-400 hover:text-pathcycle-gray-800 hover:border-pathcycle-gray-200 transition-all">
+                                Tiempo de implementación
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Contenido de la Tab -->
+                    <div class="p-6">
+                        <p class="text-sm text-pathcycle-gray-400 mb-4">Comparación del número y tamaño de componentes conexas antes y después de la simulación.</p>
+                        <div class="mt-4 h-64 bg-pathcycle-gray-50 rounded-lg flex items-center justify-center text-pathcycle-gray-400 font-medium">
+                            [Placeholder para Gráficos de Comparación (Antes/Después)]
+                        </div>
+                    </div>
+                    
+                    <!-- Pie de página con Botones de Acción -->
+                    <div class="flex justify-end gap-3 p-4 bg-pathcycle-gray-50 border-t border-pathcycle-gray-100 rounded-b-lg">
+                        <button class="py-2 px-4 bg-white text-pathcycle-danger border border-pathcycle-danger font-medium rounded-lg hover:bg-pathcycle-danger/5 transition-all">
+                            <i data-lucide="trash-2" class="inline w-4 h-4 mr-1"></i>
+                            Descartar
+                        </button>
+                        <button class="py-2 px-4 bg-white text-pathcycle-primary border border-pathcycle-primary font-medium rounded-lg hover:bg-pathcycle-primary/5 transition-all">
+                            <i data-lucide="save" class="inline w-4 h-4 mr-1"></i>
+                            Guardar Escenario
+                        </button>
+                        <button class="py-2 px-4 bg-white text-pathcycle-primary border border-pathcycle-primary font-medium rounded-lg hover:bg-pathcycle-primary/5 transition-all">
+                            <i data-lucide="bar-chart-3" class="inline w-4 h-4 mr-1"></i>
+                            Comparar con otros
+                        </button>
+                        <button class="py-2 px-5 bg-pathcycle-primary text-white font-medium rounded-lg shadow-sm hover:bg-opacity-90 transition-all">
+                            <i data-lucide="check-circle" class="inline w-4 h-4 mr-1"></i>
+                            Aprobar para Reporte
+                        </button>
+                    </div>
+                </div>
+                <!-- FIN: Sección Inferior -->
+
+            </main>
+            <!-- FIN: Área de Contenido Principal -->
+            
+        </div>
+        <!-- FIN: Wrapper de Contenido Principal -->
+        
+    </div>
+
+    <!-- Script para inicializar Lucide Icons -->
+    <script>
+        lucide.createIcons();
+    </script>
+
+</body>
+</html>

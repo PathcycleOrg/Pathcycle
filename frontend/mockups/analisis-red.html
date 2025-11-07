@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis de Red - PathCycle</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Estilo de fuente base como respaldo -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Estilos para el Toggle Switch */
+        .toggle-checkbox:checked {
+            @apply: bg-pathcycle-primary border-pathcycle-primary;
+            right: 0;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            @apply: bg-pathcycle-primary;
+        }
+    </style>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Configuración personalizada de Tailwind (Método de Objeto JS) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        /* Paleta de colores de la guía de estilo */
+                        'pathcycle-primary': '#0891B2',   /* Deep teal/cyan */
+                        'pathcycle-secondary': '#10B981', /* Vibrant green */
+                        'pathcycle-accent': '#F59E0B',    /* Amber */
+                        'pathcycle-danger': '#EF4444',    /* Red */
+                        'pathcycle-sidebar': '#0F766E',   /* Dark teal (específico del dashboard) */
+                        'pathcycle-gray': {
+                            50: '#F8FAFC',   /* Light gray panels */
+                            100: '#E2E8F0',
+                            200: '#CBD5E1',
+                            400: '#64748B',
+                            800: '#1E293B',
+                        },
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    },
+                    borderRadius: {
+                        /* 8px border radius */
+                        'lg': '8px',
+                    },
+                    boxShadow: {
+                        /* Subtle shadows */
+                        'sm': '0 1px 3px rgba(0,0,0,0.1)',
+                    }
+                }
+            }
+        }
+    </script>
+    
+</head>
+<body class="bg-pathcycle-gray-50 text-pathcycle-gray-800 font-sans antialiased">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- INICIO: Sidebar Izquierdo (PROMPT 2) -->
+        <aside class="w-60 bg-pathcycle-sidebar text-white flex flex-col flex-shrink-0">
+            
+            <!-- Logo -->
+            <div class="h-16 flex items-center justify-center px-4 gap-2 border-b border-white/10">
+                <i data-lucide="bike" class="w-7 h-7"></i>
+                <span class="text-2xl font-bold tracking-tight">PathCycle</span>
+            </div>
+            
+            <!-- Menú de Navegación -->
+            <nav class="flex-1 p-4 space-y-2">
+                <ul class="space-y-1">
+                    <!-- Estado Inactivo (Dashboard) -->
+                    <li>
+                        <a href="index.html" class="flex items-center gap-3 p-3 rounded-lg text-white/70 hover:bg-white/10 hover:text-white font-medium transition-colors">
+                            <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <!-- Estado Activo (Análisis de Red) -->
+                    <li>
+                        <a href="analisis-red.html" class="flex items-center gap-3 p-3 rounded-lg bg-white/20 text-white font-medium">
+                            <i data-lucide="map" class="w-5 h-5"></i>
+                            <span>Análisis de Red</span>
+                        </a>
+                    </li>
+                    <!-- Inactivo -->
+                    <li>
+                        <a href="simulador.html" class="flex items-center gap-3 p-3 rounded-lg text-white/70 hover:bg-white/10 hover:text-white font-medium transition-colors">
+                            <i data-lucide="rotate-cw" class="w-5 h-5"></i>
+                            <span>Simulador</span>
+                        </a>
+                    </li>
+                    <!-- Inactivo -->
+                    <li>
+                        <a href="reportes.html" class="flex items-center gap-3 p-3 rounded-lg text-white/70 hover:bg-white/10 hover:text-white font-medium transition-colors">
+                            <i data-lucide="file-text" class="w-5 h-5"></i>
+                            <span>Reportes</span>
+                        </a>
+                    </li>
+                    <!-- Inactivo -->
+                    <li>
+                        <a href="ruta-optima.html" class="flex items-center gap-3 p-3 rounded-lg text-white/70 hover:bg-white/10 hover:text-white font-medium transition-colors">
+                            <i data-lucide="route" class="w-5 h-5"></i>
+                            <span>Ruta Óptima</span>
+                        </a>
+                    </li>
+                    <!-- Inactivo -->
+                    <li>
+                        <a href="configuracion.html" class="flex items-center gap-3 p-3 rounded-lg text-white/70 hover:bg-white/10 hover:text-white font-medium transition-colors">
+                            <i data-lucide="settings" class="w-5 h-5"></i>
+                            <span>Configuración</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <!-- Perfil de Usuario -->
+            <div class="p-4 border-t border-white/10">
+                <div class="flex items-center gap-3">
+                    <img src="https://placehold.co/40x40/E2E8F0/64748B?text=UP" class="w-10 h-10 rounded-full" alt="User Avatar">
+                    <div>
+                        <p class="text-sm font-medium">Usuario Planificador</p>
+                        <p class="text-xs text-white/70">Municipalidad de Lima</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+        <!-- FIN: Sidebar Izquierdo -->
+
+        <!-- INICIO: Wrapper de Contenido Principal -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            
+            <!-- INICIO: Barra Superior (PROMPT 3 - Breadcrumb actualizado) -->
+            <header class="bg-white border-b border-pathcycle-gray-100 h-16 flex-shrink-0 flex items-center justify-between px-6">
+                
+                <!-- Breadcrumb -->
+                <div>
+                    <span class="text-sm text-pathcycle-gray-400">Dashboard /</span>
+                    <span class="text-sm font-medium text-pathcycle-gray-800">Análisis de Red</span>
+                </div>
+                
+                <!-- Barra de Búsqueda -->
+                <div class="w-full max-w-sm relative">
+                    <input type="text" placeholder="Buscar nodo, arista o componente..." class="w-full pl-10 pr-4 py-2 text-sm bg-pathcycle-gray-50 border border-pathcycle-gray-200 rounded-lg focus:ring-2 focus:ring-pathcycle-primary/50 focus:border-pathcycle-primary outline-none">
+                    <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-pathcycle-gray-400"></i>
+                </div>
+                
+                <!-- Iconos y Menú de Usuario -->
+                <div class="flex items-center gap-4">
+                    <button class="relative text-pathcycle-gray-400 hover:text-pathcycle-gray-800 transition-colors">
+                        <i data-lucide="bell" class="w-5 h-5"></i>
+                        <span class="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-pathcycle-danger ring-1 ring-white"></span>
+                    </button>
+                    
+                    <button class="flex items-center gap-2">
+                        <img src="https://placehold.co/32x32/E2E8F0/64748B?text=UP" class="w-8 h-8 rounded-full" alt="User Avatar">
+                        <span class="hidden md:block text-sm font-medium">Usuario...</span>
+                        <i data-lucide="chevron-down" class="w-4 h-4 text-pathcycle-gray-400"></i>
+                    </button>
+                </div>
+            </header>
+            <!-- FIN: Barra Superior -->
+
+            <!-- INICIO: Área de Contenido Principal (PROMPT 3) -->
+            <!-- Layout de 3 columnas -->
+            <main class="flex-1 flex overflow-hidden">
+                
+                <!-- INICIO: Panel Izquierdo (Filtros y Métricas) -->
+                <aside class="w-[300px] bg-white border-r border-pathcycle-gray-100 p-6 overflow-y-auto space-y-6 flex-shrink-0">
+                    
+                    <!-- Sección Filtros -->
+                    <div class="space-y-4">
+                        <h2 class="text-base font-bold text-pathcycle-gray-800">FILTROS Y OPCIONES</h2>
+                        
+                        <!-- Dropdown: Seleccionar Distrito (Simulado como multi-select) -->
+                        <div>
+                            <label for="distrito" class="block text-sm font-medium text-pathcycle-gray-800 mb-1">Seleccionar Distrito</label>
+                            <button class="w-full flex justify-between items-center text-left py-2 px-3 text-sm bg-pathcycle-gray-50 border border-pathcycle-gray-200 rounded-lg focus:ring-2 focus:ring-pathcycle-primary/50 focus:border-pathcycle-primary outline-none">
+                                <span>Miraflores, San Isidro...</span>
+                                <i data-lucide="chevron-down" class="w-4 h-4 text-pathcycle-gray-400"></i>
+                            </button>
+                            <!-- Aquí iría el popover del multi-select con checkboxes -->
+                        </div>
+                        
+                        <!-- Dropdown: Tipo de Vía -->
+                        <div>
+                            <label for="tipo_via" class="block text-sm font-medium text-pathcycle-gray-800 mb-1">Tipo de Vía</label>
+                            <select id="tipo_via" class="w-full py-2 px-3 text-sm bg-pathcycle-gray-50 border border-pathcycle-gray-200 rounded-lg focus:ring-2 focus:ring-pathcycle-primary/50 focus:border-pathcycle-primary outline-none">
+                                <option>Ambas</option>
+                                <option>Metropolitana</option>
+                                <option>Local</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Slider: Longitud mínima -->
+                        <div>
+                            <label for="longitud" class="block text-sm font-medium text-pathcycle-gray-800 mb-1">Longitud mínima (km)</label>
+                            <div class="flex items-center gap-2">
+                                <input id="longitud" type="range" min="0" max="15" value="0" class="w-full h-2 bg-pathcycle-gray-100 rounded-lg appearance-none cursor-pointer accent-pathcycle-primary">
+                                <span class="text-sm font-medium text-pathcycle-gray-800 w-8 text-right">0</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Toggles -->
+                        <div class="space-y-3 pt-2">
+                            <label class="flex items-center justify-between cursor-pointer">
+                                <span class="text-sm font-medium text-pathcycle-gray-800">Mostrar componentes conexas</span>
+                                <div class="relative">
+                                    <input type="checkbox" class="sr-only toggle-checkbox" checked>
+                                    <div class="toggle-label block w-10 h-6 bg-pathcycle-gray-200 rounded-full transition-all"></div>
+                                    <div class="dot absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-all"></div>
+                                </div>
+                            </label>
+                            <label class="flex items-center justify-between cursor-pointer">
+                                <span class="text-sm font-medium text-pathcycle-gray-800">Resaltar nodos críticos</span>
+                                <div class="relative">
+                                    <input type="checkbox" class="sr-only toggle-checkbox">
+                                    <div class="toggle-label block w-10 h-6 bg-pathcycle-gray-200 rounded-full transition-all"></div>
+                                    <div class="dot absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-all"></div>
+                                </div>
+                            </label>
+                            <label class="flex items-center justify-between cursor-pointer">
+                                <span class="text-sm font-medium text-pathcycle-gray-800">Métricas en tiempo real</span>
+                                <div class="relative">
+                                    <input type="checkbox" class="sr-only toggle-checkbox">
+                                    <div class="toggle-label block w-10 h-6 bg-pathcycle-gray-200 rounded-full transition-all"></div>
+                                    <div class="dot absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-all"></div>
+                                </div>
+                            </label>
+                        </div>
+                        
+                        <!-- Botones -->
+                        <div class="space-y-2 pt-2">
+                            <button class="w-full py-2 px-4 bg-pathcycle-primary text-white font-medium rounded-lg shadow-sm hover:bg-opacity-90 transition-all">
+                                Aplicar Filtros
+                            </button>
+                            <button class="w-full py-2 px-4 bg-white text-pathcycle-primary border border-pathcycle-primary font-medium rounded-lg hover:bg-pathcycle-gray-50 transition-all">
+                                Restablecer
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Separador -->
+                    <hr class="border-pathcycle-gray-100">
+                    
+                    <!-- Sección Métricas Algorítmicas -->
+                    <div class="space-y-3">
+                        <h2 class="text-base font-bold text-pathcycle-gray-800">MÉTRICAS ALGORÍTMICAS</h2>
+                        <div class="grid grid-cols-2 gap-3">
+                            <!-- Métrica 1 -->
+                            <div class="bg-pathcycle-gray-50 p-3 rounded-lg border border-pathcycle-gray-100">
+                                <i data-lucide="network" class="w-4 h-4 text-pathcycle-gray-400 mb-1"></i>
+                                <p class="text-xs text-pathcycle-gray-400">Nodos totales</p>
+                                <p class="text-lg font-bold">2,237</p>
+                            </div>
+                            <!-- Métrica 2 -->
+                            <div class="bg-pathcycle-gray-50 p-3 rounded-lg border border-pathcycle-gray-100">
+                                <i data-lucide="arrow-right-left" class="w-4 h-4 text-pathcycle-gray-400 mb-1"></i>
+                                <p class="text-xs text-pathcycle-gray-400">Aristas totales</p>
+                                <p class="text-lg font-bold">1,902</p>
+                            </div>
+                            <!-- Métrica 3 -->
+                            <div class="bg-pathcycle-gray-50 p-3 rounded-lg border border-pathcycle-gray-100">
+                                <i data-lucide="blocks" class="w-4 h-4 text-pathcycle-danger mb-1"></i>
+                                <p class="text-xs text-pathcycle-gray-400">Componentes</p>
+                                <p class="text-lg font-bold text-pathcycle-danger">47</p>
+                            </div>
+                            <!-- Métrica 4 -->
+                            <div class="bg-pathcycle-gray-50 p-3 rounded-lg border border-pathcycle-gray-100">
+                                <i data-lucide="binary" class="w-4 h-4 text-pathcycle-gray-400 mb-1"></i>
+                                <p class="text-xs text-pathcycle-gray-400">Comp. Principal</p>
+                                <p class="text-lg font-bold">78%</p>
+                            </div>
+                            <!-- Métrica 5 -->
+                            <div class="bg-pathcycle-gray-50 p-3 rounded-lg border border-pathcycle-gray-100">
+                                <i data-lucide="diameter" class="w-4 h-4 text-pathcycle-gray-400 mb-1"></i>
+                                <p class="text-xs text-pathcycle-gray-400">Diámetro</p>
+                                <p class="text-lg font-bold">23</p>
+                            </div>
+                            <!-- Métrica 6 -->
+                            <div class="bg-pathcycle-gray-50 p-3 rounded-lg border border-pathcycle-gray-100">
+                                <i data-lucide="group" class="w-4 h-4 text-pathcycle-gray-400 mb-1"></i>
+                                <p class="text-xs text-pathcycle-gray-400">Clustering</p>
+                                <p class="text-lg font-bold">0.34</p>
+                            </div>
+                            <!-- Métrica 7 -->
+                            <div class="bg-pathcycle-gray-50 p-3 rounded-lg border border-pathcycle-gray-100">
+                                <i data-lucide="server-off" class="w-4 h-4 text-pathcycle-gray-400 mb-1"></i>
+                                <p class="text-xs text-pathcycle-gray-400">Aislados</p>
+                                <p class="text-lg font-bold">89</p>
+                            </div>
+                            <!-- Métrica 8 -->
+                            <div class="bg-pathcycle-gray-50 p-3 rounded-lg border border-pathcycle-gray-100">
+                                <i data-lucide="database" class="w-4 h-4 text-pathcycle-gray-400 mb-1"></i>
+                                <p class="text-xs text-pathcycle-gray-400">Densidad</p>
+                                <p class="text-lg font-bold">0.0038</p>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+                <!-- FIN: Panel Izquierdo -->
+                
+                <!-- INICIO: Área Central (Visualización del Grafo) -->
+                <section class="flex-1 bg-pathcycle-gray-100 relative overflow-hidden">
+                    
+                    <!-- Controles flotantes -->
+                    <div class="absolute top-4 right-4 z-10 flex flex-col gap-1">
+                        <button class="w-9 h-9 flex items-center justify-center bg-white text-pathcycle-gray-800 hover:bg-pathcycle-gray-50 rounded-t-lg shadow-sm border border-pathcycle-gray-100">
+                            <i data-lucide="plus" class="w-5 h-5"></i>
+                        </button>
+                        <button class="w-9 h-9 flex items-center justify-center bg-white text-pathcycle-gray-800 hover:bg-pathcycle-gray-50 shadow-sm border-b border-pathcycle-gray-100">
+                            <i data-lucide="minus" class="w-5 h-5"></i>
+                        </button>
+                        <button class="w-9 h-9 flex items-center justify-center bg-white text-pathcycle-gray-800 hover:bg-pathcycle-gray-50 rounded-b-lg shadow-sm border border-pathcycle-gray-100">
+                            <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+                        </button>
+                        
+                        <button class="w-9 h-9 mt-2 flex items-center justify-center bg-white text-pathcycle-gray-800 hover:bg-pathcycle-gray-50 rounded-lg shadow-sm border border-pathcycle-gray-100">
+                            <i data-lucide="image" class="w-5 h-5"></i>
+                        </button>
+                        <button class="w-9 h-9 flex items-center justify-center bg-white text-pathcycle-gray-800 hover:bg-pathcycle-gray-50 rounded-lg shadow-sm border border-pathcycle-gray-100">
+                            <i data-lucide="maximize" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+
+                    <!-- Placeholder del Grafo -->
+                    <div class="flex items-center justify-center h-full">
+                        <span class="text-xl font-medium text-pathcycle-gray-400">[ Placeholder para Visualización de Grafo (Force-Directed Graph) ]</span>
+                    </div>
+
+                    <!-- Tooltip (Simulado, se mostraría con JS) -->
+                    <div class="absolute hidden top-1/2 left-1/2 bg-pathcycle-gray-800 text-white p-3 rounded-lg shadow-lg z-20">
+                        <p class="font-bold text-sm">Nodo ID: N-1234</p>
+                        <p class="text-xs">Distrito: Miraflores</p>
+                        <p class="text-xs">Grado: 8</p>
+                        <p class="text-xs">Centralidad: 0.045</p>
+                    </div>
+                </section>
+                <!-- FIN: Área Central -->
+                
+                <!-- INICIO: Panel Derecho (Nodos Críticos y Componentes) -->
+                <aside class="w-[350px] bg-white border-l border-pathcycle-gray-100 p-6 overflow-y-auto space-y-6 flex-shrink-0">
+                    
+                    <!-- Sección Nodos Críticos -->
+                    <div class="space-y-4">
+                        <h2 class="text-base font-bold text-pathcycle-gray-800">NODOS CRÍTICOS (TOP 10)</h2>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead class="border-b border-pathcycle-gray-100 text-xs text-pathcycle-gray-400 uppercase">
+                                    <tr>
+                                        <th class="py-2 pr-2">Nodo ID</th>
+                                        <th class="py-2 px-2">Ubicación</th>
+                                        <th class="py-2 px-2">Centralidad</th>
+                                        <th class="py-2 pl-2">Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Fila de datos 1 -->
+                                    <tr class="border-b border-pathcycle-gray-100">
+                                        <td class="py-2.5 pr-2 font-mono text-xs">N-0721</td>
+                                        <td class="py-2.5 px-2">Av. Arequipa c/ Angamos</td>
+                                        <td class="py-2.5 px-2 font-medium">0.82</td>
+                                        <td class="py-2.5 pl-2">
+                                            <button class="p-1 text-pathcycle-primary hover:bg-pathcycle-primary/10 rounded-full"><i data-lucide="eye" class="w-4 h-4"></i></button>
+                                        </td>
+                                    </tr>
+                                    <!-- Fila de datos 2 -->
+                                    <tr class="border-b border-pathcycle-gray-100">
+                                        <td class="py-2.5 pr-2 font-mono text-xs">N-1034</td>
+                                        <td class="py-2.5 px-2">Óvalo de Miraflores</td>
+                                        <td class="py-2.5 px-2 font-medium">0.79</td>
+                                        <td class="py-2.5 pl-2">
+                                            <button class="p-1 text-pathcycle-primary hover:bg-pathcycle-primary/10 rounded-full"><i data-lucide="eye" class="w-4 h-4"></i></button>
+                                        </td>
+                                    </tr>
+                                    <!-- Fila de datos 3 -->
+                                    <tr class="border-b border-pathcycle-gray-100">
+                                        <td class="py-2.5 pr-2 font-mono text-xs">N-0045</td>
+                                        <td class="py-2.5 px-2">Puente Benavides (Pan.)</td>
+                                        <td class="py-2.5 px-2 font-medium">0.75</td>
+                                        <td class="py-2.5 pl-2">
+                                            <button class="p-1 text-pathcycle-primary hover:bg-pathcycle-primary/10 rounded-full"><i data-lucide="eye" class="w-4 h-4"></i></button>
+                                        </td>
+                                    </tr>
+                                    <!-- Fila de datos 4 -->
+                                    <tr class="border-b border-pathcycle-gray-100">
+                                        <td class="py-2.5 pr-2 font-mono text-xs">N-0881</td>
+                                        <td class="py-2.5 px-2">Av. Universitaria c/ La Mar</td>
+                                        <td class="py-2.5 px-2 font-medium">0.71</td>
+                                        <td class="py-2.5 pl-2">
+                                            <button class="p-1 text-pathcycle-primary hover:bg-pathcycle-primary/10 rounded-full"><i data-lucide="eye" class="w-4 h-4"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <a href="#" class="text-xs font-medium text-pathcycle-primary hover:underline mt-2 inline-block">Ver todos (Top 10)</a>
+                        </div>
+                    </div>
+
+                    <!-- Separador -->
+                    <hr class="border-pathcycle-gray-100">
+
+                    <!-- Sección Componentes Desconectadas -->
+                    <div class="space-y-3">
+                        <h2 class="text-base font-bold text-pathcycle-gray-800">COMPONENTES DESCONECTADAS</h2>
+                        <ul class="space-y-2">
+                            <!-- Componente 1 -->
+                            <li class="flex items-center justify-between p-3 bg-pathcycle-gray-50 rounded-lg border border-pathcycle-gray-100">
+                                <div>
+                                    <p class="text-sm font-medium">Componente #1</p>
+                                    <p class="text-xs text-pathcycle-gray-400">1,745 nodos (78%)</p>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-green-100 text-green-700">Principal</span>
+                                    <button class="text-xs font-medium text-pathcycle-primary hover:underline">Analizar</button>
+                                </div>
+                            </li>
+                            <!-- Componente 2 -->
+                            <li class="flex items-center justify-between p-3 bg-pathcycle-gray-50 rounded-lg border border-pathcycle-gray-100">
+                                <div>
+                                    <p class="text-sm font-medium">Componente #2</p>
+                                    <p class="text-xs text-pathcycle-gray-400">156 nodos (7%)</p>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700">Media</span>
+                                    <button class="text-xs font-medium text-pathcycle-primary hover:underline">Analizar</button>
+                                </div>
+                            </li>
+                            <!-- Componente 3 -->
+                            <li class="flex items-center justify-between p-3 bg-pathcycle-gray-50 rounded-lg border border-pathcycle-gray-100">
+                                <div>
+                                    <p class="text-sm font-medium">Componente #3</p>
+                                    <p class="text-xs text-pathcycle-gray-400">89 nodos (4%)</p>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-orange-100 text-orange-700">Pequeña</span>
+                                    <button class="text-xs font-medium text-pathcycle-primary hover:underline">Analizar</button>
+                                </div>
+                            </li>
+                            <!-- Componente 4 -->
+                            <li class="flex items-center justify-between p-3 bg-pathcycle-gray-50 rounded-lg border border-pathcycle-gray-100">
+                                <div>
+                                    <p class="text-sm font-medium">Componente #4</p>
+                                    <p class="text-xs text-pathcycle-gray-400">32 nodos (1.4%)</p>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-red-100 text-red-700">Aislada</span>
+                                    <button class="text-xs font-medium text-pathcycle-primary hover:underline">Analizar</button>
+                                </div>
+                            </li>
+                        </ul>
+                        <a href="#" class="text-xs font-medium text-pathcycle-primary hover:underline mt-2 inline-block">Ver todas (47)</a>
+                    </div>
+
+                </aside>
+                <!-- FIN: Panel Derecho -->
+
+            </main>
+            <!-- FIN: Área de Contenido Principal -->
+            
+        </div>
+        <!-- FIN: Wrapper de Contenido Principal -->
+        
+    </div>
+
+    <!-- Script para inicializar Lucide Icons -->
+    <script>
+        lucide.createIcons();
+        
+        // Pequeño script para el slider
+        const range = document.getElementById('longitud');
+        const rangeValue = range.nextElementSibling;
+        range.addEventListener('input', (e) => {
+            rangeValue.textContent = e.target.value;
+        });
+
+        // Pequeño script para los toggles (simplificado)
+        document.querySelectorAll('.toggle-checkbox').forEach(toggle => {
+            toggle.addEventListener('change', (e) => {
+                const dot = e.target.nextElementSibling.nextElementSibling;
+                if (e.target.checked) {
+                    dot.style.transform = 'translateX(16px)';
+                } else {
+                    dot.style.transform = 'translateX(0)';
+                }
+            });
+            // Inicializar estado
+            if (toggle.checked) {
+                toggle.nextElementSibling.nextElementSibling.style.transform = 'translateX(16px)';
+            }
+        });
+    </script>
+
+</body>
+</html>

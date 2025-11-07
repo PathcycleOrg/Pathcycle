@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración - PathCycle</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Estilo de fuente base como respaldo -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Estilo para los radio/checkbox personalizados */
+        input[type="radio"]:checked, input[type="checkbox"]:checked {
+            background-color: #0891B2; /* pathcycle-primary */
+            border-color: #0891B2;
+        }
+        /* Estilo para el slider */
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #0891B2; /* pathcycle-primary */
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: #0891B2;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        /* Estilo para el toggle switch */
+        .peer:checked ~ .peer-checked\:bg-pathcycle-primary {
+            background-color: #0891B2;
+        }
+        .peer:checked ~ .peer-checked\:translate-x-5 {
+            transform: translateX(1.25rem);
+        }
+    </style>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Configuración personalizada de Tailwind (Método de Objeto JS) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        /* Paleta de colores de la guía de estilo */
+                        'pathcycle-primary': '#0891B2',   /* Deep teal/cyan */
+                        'pathcycle-secondary': '#10B981', /* Vibrant green */
+                        'pathcycle-accent': '#F59E0B',    /* Amber */
+                        'pathcycle-danger': '#EF4444',    /* Red */
+                        'pathcycle-sidebar': '#0F766E',   /* Dark teal (específico del dashboard) */
+                        'pathcycle-gray': {
+                            50: '#F8FAFC',   /* Light gray panels */
+                            100: '#E2E8F0',
+                            200: '#CBD5E1',
+                            400: '#64748B',
+                            800: '#1E293B',
+                        },
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    },
+                    borderRadius: {
+                        /* 8px border radius */
+                        'lg': '8px',
+                    },
+                    boxShadow: {
+                        /* Subtle shadows */
+                        'sm': '0 1px 3px rgba(0,0,0,0.1)',
+                        'xl': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                        '2xl': '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+                    }
+                }
+            }
+        }
+    </script>
+    
+</head>
+<body class="bg-pathcycle-gray-50 text-pathcycle-gray-800 font-sans antialiased">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- INICIO: Sidebar Izquierdo -->
+        <aside class="w-60 bg-pathcycle-sidebar text-white flex flex-col flex-shrink-0">
+            
+            <!-- Logo -->
+            <div class="h-16 flex items-center justify-center px-4 gap-2 border-b border-white/10">
+                <i data-lucide="bike" class="w-7 h-7"></i>
+                <span class="text-2xl font-bold tracking-tight">PathCycle</span>
+            </div>
+            
+            <!-- Menú de Navegación -->
+            <nav class="flex-1 p-4 space-y-2">
+                <ul class="space-y-1">
+                    <!-- Dashboard -->
+                    <li>
+                        <a href="index.html" class="flex items-center gap-3 p-3 rounded-lg text-white/70 hover:bg-white/10 hover:text-white font-medium transition-colors">
+                            <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <!-- Analsis de Red -->
+                    <li>
+                        <a href="analisis-red.html" class="flex items-center gap-3 p-3 rounded-lg text-white/70 hover:bg-white/10 hover:text-white font-medium transition-colors">
+                            <i data-lucide="map" class="w-5 h-5"></i>
+                            <span>Análisis de Red</span>
+                        </a>
+                    </li>
+                    <!-- Simulador -->
+                    <li>
+                        <a href="simulador.html" class="flex items-center gap-3 p-3 rounded-lg text-white/70 hover:bg-white/10 hover:text-white font-medium transition-colors">
+                            <i data-lucide="rotate-cw" class="w-5 h-5"></i>
+                            <span>Simulador</span>
+                        </a>
+                    </li>
+                    <!-- Reportes -->
+                    <li>
+                        <a href="reportes.html" class="flex items-center gap-3 p-3 rounded-lg text-white/70 hover:bg-white/10 hover:text-white font-medium transition-colors">
+                            <i data-lucide="file-text" class="w-5 h-5"></i>
+                            <span>Reportes</span>
+                        </a>
+                    </li>
+                    <!-- Ruta Óptima -->
+                    <li>
+                        <a href="ruta-optima.html" class="flex items-center gap-3 p-3 rounded-lg text-white/70 hover:bg-white/10 hover:text-white font-medium transition-colors">
+                            <i data-lucide="route" class="w-5 h-5"></i>
+                            <span>Ruta Óptima</span>
+                        </a>
+                    </li>
+                    <!-- Configuración -->
+                    <li>
+                        <a href="configuracion.html" class="flex items-center gap-3 p-3 rounded-lg bg-white/20 text-white font-medium">
+                            <i data-lucide="settings" class="w-5 h-5"></i>
+                            <span>Configuración</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <!-- Perfil de Usuario -->
+            <div class="p-4 border-t border-white/10">
+                <div class="flex items-center gap-3">
+                    <img src="https://placehold.co/40x40/E2E8F0/64748B?text=UP" class="w-10 h-10 rounded-full" alt="User Avatar">
+                    <div>
+                        <p class="text-sm font-medium">Usuario Planificador</p>
+                        <p class="text-xs text-white/70">Municipalidad de Lima</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+        <!-- FIN: Sidebar Izquierdo -->
+
+        <!-- INICIO: Wrapper de Contenido Principal -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            
+            <!-- INICIO: Barra Superior -->
+            <header class="bg-white border-b border-pathcycle-gray-100 h-16 flex-shrink-0 flex items-center justify-between px-6">
+                
+                <!-- Breadcrumb -->
+                <div>
+                    <span class="text-sm text-pathcycle-gray-400">Dashboard /</span>
+                    <span class="text-sm font-medium text-pathcycle-gray-800">Configuración</span>
+                </div>
+                
+                <!-- Barra de Búsqueda -->
+                <div class="w-full max-w-sm relative">
+                    <input type="text" placeholder="Buscar..." class="w-full pl-10 pr-4 py-2 text-sm bg-pathcycle-gray-50 border border-pathcycle-gray-200 rounded-lg focus:ring-2 focus:ring-pathcycle-primary/50 focus:border-pathcycle-primary outline-none">
+                    <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-pathcycle-gray-400"></i>
+                </div>
+                
+                <!-- Iconos y Menú de Usuario -->
+                <div class="flex items-center gap-4">
+                    <button class="relative text-pathcycle-gray-400 hover:text-pathcycle-gray-800 transition-colors">
+                        <i data-lucide="bell" class="w-5 h-5"></i>
+                        <span class="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-pathcycle-danger ring-1 ring-white"></span>
+                    </button>
+                    
+                    <button class="flex items-center gap-2">
+                        <img src="https://placehold.co/32x32/E2E8F0/64748B?text=UP" class="w-8 h-8 rounded-full" alt="User Avatar">
+                        <span class="hidden md:block text-sm font-medium">Usuario...</span>
+                        <i data-lucide="chevron-down" class="w-4 h-4 text-pathcycle-gray-400"></i>
+                    </button>
+                </div>
+            </header>
+            <!-- FIN: Barra Superior -->
+
+            <!-- INICIO: Área de Contenido Principal (PROMPT 7) -->
+            <main class="flex-1 overflow-y-auto p-6 space-y-6">
+                
+                <h1 class="text-3xl font-bold text-pathcycle-gray-800">Configuración del Sistema</h1>
+                
+                <div class="flex gap-6">
+                    
+                    <!-- Sidebar de Configuración (Izquierda) -->
+                    <aside class="w-full max-w-xs xl:max-w-[280px] flex-shrink-0">
+                        <nav class="flex flex-col space-y-1">
+                            <!-- Activo -->
+                            <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-pathcycle-primary/10 text-pathcycle-primary font-medium border-l-2 border-pathcycle-primary">
+                                <i data-lucide="user-cog" class="w-5 h-5"></i>
+                                <span>Perfil de Usuario</span>
+                            </a>
+                            <!-- Inactivos -->
+                            <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-pathcycle-gray-400 hover:text-pathcycle-gray-800 hover:bg-pathcycle-gray-50 font-medium border-l-2 border-transparent">
+                                <i data-lucide="map-pin" class="w-5 h-5"></i>
+                                <span>Configuración de Mapas</span>
+                            </a>
+                            <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-pathcycle-gray-400 hover:text-pathcycle-gray-800 hover:bg-pathcycle-gray-50 font-medium border-l-2 border-transparent">
+                                <i data-lucide="network" class="w-5 h-5"></i>
+                                <span>Parámetros Algorítmicos</span>
+                            </a>
+                            <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-pathcycle-gray-400 hover:text-pathcycle-gray-800 hover:bg-pathcycle-gray-50 font-medium border-l-2 border-transparent">
+                                <i data-lucide="bell-ring" class="w-5 h-5"></i>
+                                <span>Notificaciones</span>
+                            </a>
+                            <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-pathcycle-gray-400 hover:text-pathcycle-gray-800 hover:bg-pathcycle-gray-50 font-medium border-l-2 border-transparent">
+                                <i data-lucide="lock" class="w-5 h-5"></i>
+                                <span>Seguridad y Acceso</span>
+                            </a>
+                            <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-pathcycle-gray-400 hover:text-pathcycle-gray-800 hover:bg-pathcycle-gray-50 font-medium border-l-2 border-transparent">
+                                <i data-lucide="database" class="w-5 h-5"></i>
+                                <span>Gestión de Datos</span>
+                            </a>
+                            <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-pathcycle-gray-400 hover:text-pathcycle-gray-800 hover:bg-pathcycle-gray-50 font-medium border-l-2 border-transparent">
+                                <i data-lucide="palette" class="w-5 h-5"></i>
+                                <span>Apariencia</span>
+                            </a>
+                            <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-pathcycle-gray-400 hover:text-pathcycle-gray-800 hover:bg-pathcycle-gray-50 font-medium border-l-2 border-transparent">
+                                <i data-lucide="info" class="w-5 h-5"></i>
+                                <span>Acerca de</span>
+                            </a>
+                        </nav>
+                    </aside>
+                    
+                    <!-- Área de Contenido de Configuración (Derecha) -->
+                    <div class="flex-1 bg-white p-6 rounded-lg shadow-sm border border-pathcycle-gray-100 divide-y divide-pathcycle-gray-100">
+                        
+                        <!-- Sección 1: Información del Usuario -->
+                        <section class="pb-6">
+                            <h2 class="text-xl font-bold text-pathcycle-gray-800 mb-4">Información del Usuario</h2>
+                            <div class="flex items-center gap-6">
+                                <div class="relative w-32 h-32 flex-shrink-0">
+                                    <img src="https://placehold.co/120x120/E2E8F0/64748B?text=UP" alt="Avatar" class="w-full h-full rounded-full object-cover">
+                                    <button class="absolute bottom-1 right-1 p-2 bg-white rounded-full shadow-md text-pathcycle-primary hover:bg-pathcycle-gray-50">
+                                        <i data-lucide="camera" class="w-5 h-5"></i>
+                                    </button>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4 flex-1">
+                                    <div>
+                                        <label for="full_name" class="block text-sm font-medium text-pathcycle-gray-400 mb-1">Nombre completo</label>
+                                        <input type="text" id="full_name" value="Usuario Planificador" class="w-full text-sm bg-pathcycle-gray-50 border border-pathcycle-gray-200 rounded-lg p-2.5 focus:ring-2 focus:ring-pathcycle-primary/50 focus:border-pathcycle-primary outline-none">
+                                    </div>
+                                    <div>
+                                        <label for="role" class="block text-sm font-medium text-pathcycle-gray-400 mb-1">Cargo</label>
+                                        <input type="text" id="role" value="Planificador Urbano" class="w-full text-sm bg-pathcycle-gray-50 border border-pathcycle-gray-200 rounded-lg p-2.5 focus:ring-2 focus:ring-pathcycle-primary/50 focus:border-pathcycle-primary outline-none">
+                                    </div>
+                                    <div>
+                                        <label for="institution" class="block text-sm font-medium text-pathcycle-gray-400 mb-1">Institución</label>
+                                        <select id="institution" class="w-full text-sm bg-pathcycle-gray-50 border border-pathcycle-gray-200 rounded-lg p-2.5 focus:ring-2 focus:ring-pathcycle-primary/50 focus:border-pathcycle-primary outline-none">
+                                            <option selected>Municipalidad de Lima</option>
+                                            <option>Otro</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="email" class="block text-sm font-medium text-pathcycle-gray-400 mb-1">Email</label>
+                                        <div class="relative">
+                                            <input type="email" id="email" value="usuario@munlima.gob.pe" class="w-full text-sm bg-pathcycle-gray-50 border border-pathcycle-gray-200 rounded-lg p-2.5 pr-10 focus:ring-2 focus:ring-pathcycle-primary/50 focus:border-pathcycle-primary outline-none">
+                                            <i data-lucide="check-circle" class="w-5 h-5 absolute right-3 top-1/2 -translate-y-1/2 text-pathcycle-secondary"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex justify-end mt-4">
+                                <button class="py-2 px-5 bg-pathcycle-primary text-white font-medium rounded-lg shadow-sm hover:bg-opacity-90 transition-all">
+                                    Guardar Cambios
+                                </button>
+                            </div>
+                        </section>
+                        
+                        <!-- Sección 2: Preferencias de Análisis -->
+                        <section class="py-6">
+                            <h2 class="text-xl font-bold text-pathcycle-gray-800 mb-4">Preferencias de Análisis</h2>
+                            <div class="space-y-4">
+                                <!-- Toggle 1 -->
+                                <label class="flex items-center justify-between cursor-pointer">
+                                    <span class="text-sm">Usar cache para consultas frecuentes</span>
+                                    <div class="relative">
+                                        <input type="checkbox" class="sr-only peer" checked>
+                                        <div class="w-11 h-6 bg-pathcycle-gray-200 rounded-full peer peer-checked:bg-pathcycle-primary"></div>
+                                        <div class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-5"></div>
+                                    </div>
+                                </label>
+                                <!-- Toggle 2 -->
+                                <label class="flex items-center justify-between cursor-pointer">
+                                    <span class="text-sm">Mostrar métricas avanzadas por defecto</span>
+                                    <div class="relative">
+                                        <input type="checkbox" class="sr-only peer">
+                                        <div class="w-11 h-6 bg-pathcycle-gray-200 rounded-full peer peer-checked:bg-pathcycle-primary"></div>
+                                        <div class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-5"></div>
+                                    </div>
+                                </label>
+                                <!-- Toggle 3 -->
+                                <label class="flex items-center justify-between cursor-pointer">
+                                    <span class="text-sm">Habilitar modo de análisis en tiempo real</span>
+                                    <div class="relative">
+                                        <input type="checkbox" class="sr-only peer" checked>
+                                        <div class="w-11 h-6 bg-pathcycle-gray-200 rounded-full peer peer-checked:bg-pathcycle-primary"></div>
+                                        <div class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-5"></div>
+                                    </div>
+                                </label>
+                                
+                                <div class="grid grid-cols-2 gap-4 pt-2">
+                                    <div>
+                                        <label for="algorithm" class="block text-sm font-medium text-pathcycle-gray-400 mb-1">Algoritmo preferido para rutas</label>
+                                        <select id="algorithm" class="w-full text-sm bg-pathcycle-gray-50 border border-pathcycle-gray-200 rounded-lg p-2.5 focus:ring-2 focus:ring-pathcycle-primary/50 focus:border-pathcycle-primary outline-none">
+                                            <option selected>Dijkstra (estándar)</option>
+                                            <option>A* (optimizado con heurística)</option>
+                                            <option>Bellman-Ford (permite pesos negativos)</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="timeout" class="block text-sm font-medium text-pathcycle-gray-400 mb-1">Timeout para cálculos (segundos)</label>
+                                        <input type="number" id="timeout" value="30" class="w-full text-sm bg-pathcycle-gray-50 border border-pathcycle-gray-200 rounded-lg p-2.5 focus:ring-2 focus:ring-pathcycle-primary/50 focus:border-pathcycle-primary outline-none">
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        
+                        <!-- Sección 3: Parámetros de Segmentación -->
+                        <section class="py-6">
+                            <h2 class="text-xl font-bold text-pathcycle-gray-800 mb-2">Parámetros de Segmentación</h2>
+                            <p class="text-sm text-pathcycle-gray-400 mb-4">Estos parámetros afectan cómo se genera el grafo de ciclovías</p>
+                            <div class="grid grid-cols-3 gap-4">
+                                <div>
+                                    <label for="segment_length" class="block text-sm font-medium text-pathcycle-gray-400 mb-1">Longitud de segmento (metros)</label>
+                                    <input type="number" id="segment_length" value="200" class="w-full text-sm bg-pathcycle-gray-50 border border-pathcycle-gray-200 rounded-lg p-2.5 focus:ring-2 focus:ring-pathcycle-primary/50 focus:border-pathcycle-primary outline-none">
+                                </div>
+                                <div>
+                                    <label for="search_radius" class="block text-sm font-medium text-pathcycle-gray-400 mb-1">Radio de búsqueda (metros)</label>
+                                    <input type="number" id="search_radius" value="50" class="w-full text-sm bg-pathcycle-gray-50 border border-pathcycle-gray-200 rounded-lg p-2.5 focus:ring-2 focus:ring-pathcycle-primary/50 focus:border-pathcycle-primary outline-none">
+                                </div>
+                                <div>
+                                    <label for="component_threshold" class="block text-sm font-medium text-pathcycle-gray-400 mb-1">Threshold de componente (nodos)</label>
+                                    <input type="number" id="component_threshold" value="3" class="w-full text-sm bg-pathcycle-gray-50 border border-pathcycle-gray-200 rounded-lg p-2.5 focus:ring-2 focus:ring-pathcycle-primary/50 focus:border-pathcycle-primary outline-none">
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center mt-4 p-3 rounded-lg bg-pathcycle-accent/10 border-l-4 border-pathcycle-accent">
+                                <p class="text-sm text-pathcycle-accent/80 font-medium">⚠️ Cambiar estos valores regenerará todo el grafo. El proceso puede tomar varios minutos.</p>
+                                <button class="py-2 px-4 bg-pathcycle-accent text-white font-medium rounded-lg shadow-sm hover:bg-opacity-90 transition-all flex-shrink-0">
+                                    <i data-lucide="refresh-cw" class="inline w-4 h-4 mr-1.5"></i>
+                                    Regenerar Grafo
+                                </button>
+                            </div>
+                        </section>
+
+                        <!-- Sección 4: Exportación y Backup -->
+                        <section class="pt-6">
+                            <h2 class="text-xl font-bold text-pathcycle-gray-800 mb-4">Exportación y Backup</h2>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <!-- Card 1: Exportar -->
+                                <div class="bg-pathcycle-gray-50 p-4 rounded-lg border border-pathcycle-gray-100 space-y-3">
+                                    <h3 class="font-bold text-pathcycle-gray-800">Exportar Datos</h3>
+                                    <button class="w-full py-2 px-3 text-sm bg-white text-pathcycle-primary border border-pathcycle-primary font-medium rounded-lg hover:bg-pathcycle-primary/5 transition-all">Descargar Dataset (CSV)</button>
+                                    <button class="w-full py-2 px-3 text-sm bg-white text-pathcycle-primary border border-pathcycle-primary font-medium rounded-lg hover:bg-pathcycle-primary/5 transition-all">Exportar Grafo (GraphML)</button>
+                                    <p class="text-xs text-pathcycle-gray-400">Última exportación: 15/10/2025</p>
+                                </div>
+                                <!-- Card 2: Backup -->
+                                <div class="bg-pathcycle-gray-50 p-4 rounded-lg border border-pathcycle-gray-100 space-y-3">
+                                    <h3 class="font-bold text-pathcycle-gray-800">Backup Automático</h3>
+                                    <label class="flex items-center justify-between cursor-pointer">
+                                        <span class="text-sm">Habilitar backups</span>
+                                        <div class="relative">
+                                            <input type="checkbox" class="sr-only peer" checked>
+                                            <div class="w-11 h-6 bg-pathcycle-gray-200 rounded-full peer peer-checked:bg-pathcycle-primary"></div>
+                                            <div class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-5"></div>
+                                        </div>
+                                    </Llabel>
+                                    <select class="w-full text-sm bg-white border border-pathcycle-gray-200 rounded-lg p-2 focus:ring-2 focus:ring-pathcycle-primary/50 focus:border-pathcycle-primary outline-none">
+                                        <option>Diario</option>
+                                        <option selected>Semanal</option>
+                                        <option>Mensual</option>
+                                    </select>
+                                    <p class="text-xs text-pathcycle-gray-400">Último backup: 20/10/2025 03:00 AM</p>
+                                </div>
+                                <!-- Card 3: Importar -->
+                                <div class="bg-pathcycle-gray-50 p-4 rounded-lg border border-pathcycle-gray-100 space-y-3">
+                                    <h3 class="font-bold text-pathcycle-gray-800">Importar Datos</h3>
+                                    <div class="text-center p-4 border-2 border-dashed border-pathcycle-gray-200 rounded-lg">
+                                        <i data-lucide="upload-cloud" class="w-8 h-8 mx-auto text-pathcycle-gray-400"></i>
+                                        <p class="text-sm text-pathcycle-gray-400 mt-1">Arrastra un archivo o <span class="font-medium text-pathcycle-primary">haz clic</span></a`</p>
+                                    </div>
+                                    <p class="text-xs text-pathcycle-gray-400">Formatos: CSV, Excel, JSON</p>
+                                </div>
+                            </div>
+                        </section>
+
+                    </div>
+                    
+                </div>
+                
+            </main>
+            <!-- FIN: Área de Contenido Principal -->
+            
+        </div>
+        <!-- FIN: Wrapper de Contenido Principal -->
+        
+    </div>
+
+    <!-- Script para inicializar Lucide Icons -->
+    <script>
+        lucide.createIcons();
+    </script>
+
+</body>
+</html>
