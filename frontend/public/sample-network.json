@@ -1,0 +1,31 @@
+{
+  "nodes": [
+    { "id": "EST-001", "name": "Estación Central Lima", "group": 1, "val": 4 },
+    { "id": "EST-002", "name": "Terminal Plaza Norte", "group": 1, "val": 3 },
+    { "id": "EST-003", "name": "Estación Grau", "group": 1, "val": 3 },
+    { "id": "TRF-001", "name": "Intersección Javier Prado", "group": 2, "val": 2 },
+    { "id": "TRF-002", "name": "Óvalo Monitor", "group": 2, "val": 2 },
+    { "id": "TRF-003", "name": "Cruce Angamos", "group": 2, "val": 2 },
+    { "id": "HUB-001", "name": "Centro Logístico Ate", "group": 3, "val": 3 },
+    { "id": "HUB-002", "name": "Centro Distribución Sur", "group": 3, "val": 2 },
+    { "id": "MNT-001", "name": "Taller Mantenimiento Principal", "group": 4, "val": 2 },
+    { "id": "MNT-002", "name": "Punto Servicio Técnico", "group": 4, "val": 1 },
+    { "id": "EMG-001", "name": "Centro Emergencias Norte", "group": 5, "val": 2 },
+    { "id": "EMG-002", "name": "Unidad Respuesta Rápida", "group": 5, "val": 1 }
+  ],
+  "links": [
+    { "source": "EST-001", "target": "EST-002", "value": 1 },
+    { "source": "EST-001", "target": "EST-003", "value": 1 },
+    { "source": "EST-002", "target": "TRF-001", "value": 1 },
+    { "source": "EST-003", "target": "TRF-003", "value": 1 },
+    { "source": "TRF-001", "target": "TRF-002", "value": 1 },
+    { "source": "TRF-002", "target": "TRF-003", "value": 1 },
+    { "source": "TRF-001", "target": "HUB-001", "value": 1 },
+    { "source": "TRF-003", "target": "HUB-002", "value": 1 },
+    { "source": "HUB-001", "target": "MNT-001", "value": 1 },
+    { "source": "HUB-002", "target": "MNT-002", "value": 1 },
+    { "source": "MNT-001", "target": "EMG-001", "value": 1 },
+    { "source": "MNT-002", "target": "EMG-002", "value": 1 },
+    { "source": "EMG-001", "target": "EMG-002", "value": 1 }
+  ]
+}

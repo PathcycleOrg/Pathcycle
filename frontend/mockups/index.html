@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PathCycle Dashboard</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Estilo de fuente base como respaldo -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+    
+    <!-- Tailwind CSS CDN -->
+    <!-- DEBE cargarse PRIMERO para que el objeto 'tailwind' esté definido -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Configuración personalizada de Tailwind (Método de Objeto JS) -->
+    <!-- DEBE cargarse DESPUÉS para poder modificar 'tailwind.config' -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        /* Paleta de colores de la guía de estilo */
+                        'pathcycle-primary': '#0891B2',   /* Deep teal/cyan */
+                        'pathcycle-secondary': '#10B981', /* Vibrant green */
+                        'pathcycle-accent': '#F59E0B',    /* Amber */
+                        'pathcycle-danger': '#EF4444',    /* Red */
+                        'pathcycle-sidebar': '#0F766E',   /* Dark teal (específico del dashboard) */
+                        'pathcycle-gray': {
+                            50: '#F8FAFC',   /* Light gray panels */
+                            100: '#E2E8F0',
+                            200: '#CBD5E1',
+                            400: '#64748B',
+                            800: '#1E293B',
+                        },
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    },
+                    borderRadius: {
+                        /* 8px border radius */
+                        'lg': '8px',
+                    },
+                    boxShadow: {
+                        /* Subtle shadows */
+                        'sm': '0 1px 3px rgba(0,0,0,0.1)',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!--- EL SCRIPT DE TAILWIND ESTABA AQUÍ ANTES (ORDEN INCORRECTO) --->
+    
+</head>
+<body class="bg-pathcycle-gray-50 text-pathcycle-gray-800 font-sans antialiased">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- INICIO: Sidebar Izquierdo -->
+        <aside class="w-60 bg-pathcycle-sidebar text-white flex flex-col flex-shrink-0">
+            
+            <!-- Logo -->
+            <div class="h-16 flex items-center justify-center px-4 gap-2 border-b border-white/10">
+                <i data-lucide="bike" class="w-7 h-7"></i>
+                <span class="text-2xl font-bold tracking-tight">PathCycle</span>
+            </div>
+            
+            <!-- Menú de Navegación -->
+            <nav class="flex-1 p-4 space-y-2">
+                <ul class="space-y-1">
+                    <!-- Dashboard -->
+                    <li>
+                        <a href="index.html" class="flex items-center gap-3 p-3 rounded-lg bg-white/20 text-white font-medium">
+                            <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <!-- Analsis de Red -->
+                    <li>
+                        <a href="analisis-red.html" class="flex items-center gap-3 p-3 rounded-lg text-white/70 hover:bg-white/10 hover:text-white font-medium transition-colors">
+                            <i data-lucide="map" class="w-5 h-5"></i>
+                            <span>Análisis de Red</span>
+                        </a>
+                    </li>
+                    <!-- Simulador -->
+                    <li>
+                        <a href="simulador.html" class="flex items-center gap-3 p-3 rounded-lg text-white/70 hover:bg-white/10 hover:text-white font-medium transition-colors">
+                            <i data-lucide="rotate-cw" class="w-5 h-5"></i>
+                            <span>Simulador</span>
+                        </a>
+                    </li>
+                    <!-- Reportes -->
+                    <li>
+                        <a href="reportes.html" class="flex items-center gap-3 p-3 rounded-lg text-white/70 hover:bg-white/10 hover:text-white font-medium transition-colors">
+                            <i data-lucide="file-text" class="w-5 h-5"></i>
+                            <span>Reportes</span>
+                        </a>
+                    </li>
+                    <!-- Ruta Óptima -->
+                    <li>
+                        <a href="ruta-optima.html" class="flex items-center gap-3 p-3 rounded-lg text-white/70 hover:bg-white/10 hover:text-white font-medium transition-colors">
+                            <i data-lucide="route" class="w-5 h-5"></i>
+                            <span>Ruta Óptima</span>
+                        </a>
+                    </li>
+                    <!-- Configuración -->
+                    <li>
+                        <a href="configuracion.html" class="flex items-center gap-3 p-3 rounded-lg text-white/70 hover:bg-white/10 hover:text-white font-medium transition-colors">
+                            <i data-lucide="settings" class="w-5 h-5"></i>
+                            <span>Configuración</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <!-- Perfil de Usuario -->
+            <div class="p-4 border-t border-white/10">
+                <div class="flex items-center gap-3">
+                    <img src="https://placehold.co/40x40/E2E8F0/64748B?text=UP" class="w-10 h-10 rounded-full" alt="User Avatar">
+                    <div>
+                        <p class="text-sm font-medium">Usuario Planificador</p>
+                        <p class="text-xs text-white/70">Municipalidad de Lima</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+        <!-- FIN: Sidebar Izquierdo -->
+
+        <!-- INICIO: Wrapper de Contenido Principal -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            
+            <!-- INICIO: Barra Superior (PROMPT 2) -->
+            <header class="bg-white border-b border-pathcycle-gray-100 h-16 flex-shrink-0 flex items-center justify-between px-6">
+                
+                <!-- Breadcrumb -->
+                <div>
+                    <span class="text-sm text-pathcycle-gray-400">Dashboard /</span>
+                    <span class="text-sm font-medium text-pathcycle-gray-800">Vista General</span>
+                </div>
+                
+                <!-- Barra de Búsqueda -->
+                <div class="w-full max-w-sm relative">
+                    <input type="text" placeholder="Buscar distrito, componente o métrica..." class="w-full pl-10 pr-4 py-2 text-sm bg-pathcycle-gray-50 border border-pathcycle-gray-200 rounded-lg focus:ring-2 focus:ring-pathcycle-primary/50 focus:border-pathcycle-primary outline-none">
+                    <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-pathcycle-gray-400"></i>
+                </div>
+                
+                <!-- Iconos y Menú de Usuario -->
+                <div class="flex items-center gap-4">
+                    <button class="relative text-pathcycle-gray-400 hover:text-pathcycle-gray-800 transition-colors">
+                        <i data-lucide="bell" class="w-5 h-5"></i>
+                        <!-- Indicador de notificación -->
+                        <span class="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-pathcycle-danger ring-1 ring-white"></span>
+                    </button>
+                    
+                    <!-- Dropdown de Usuario -->
+                    <button class="flex items-center gap-2">
+                        <img src="https://placehold.co/32x32/E2E8F0/64748B?text=UP" class="w-8 h-8 rounded-full" alt="User Avatar">
+                        <span class="hidden md:block text-sm font-medium">Usuario...</span>
+                        <i data-lucide="chevron-down" class="w-4 h-4 text-pathcycle-gray-400"></i>
+                    </button>
+                </div>
+            </header>
+            <!-- FIN: Barra Superior -->
+
+            <!-- INICIO: Área de Contenido Principal (PROMPT 2) -->
+            <main class="flex-1 overflow-y-auto p-6 md:p-8 space-y-6">
+                
+                <!-- Fila de Métricas Superiores -->
+                <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Card 1: Kilómetros Totales -->
+                    <div class="bg-white p-5 rounded-lg shadow-sm border border-pathcycle-gray-100">
+                        <h3 class="text-sm font-medium text-pathcycle-gray-400 uppercase tracking-wider">Kilómetros Totales</h3>
+                        <p class="text-3xl font-bold text-pathcycle-primary mt-1">323.43 km</p>
+                    </div>
+                    
+                    <!-- Card 2: Componentes Conexas -->
+                    <div class="bg-white p-5 rounded-lg shadow-sm border border-pathcycle-gray-100">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-sm font-medium text-pathcycle-gray-400 uppercase tracking-wider">Componentes Conexas</h3>
+                            <i data-lucide="alert-triangle" class="w-5 h-5 text-pathcycle-danger"></i>
+                        </div>
+                        <p class="text-3xl font-bold text-pathcycle-danger mt-1">47</p>
+                    </div>
+                    
+                    <!-- Card 3: Conectividad -->
+                    <div class="bg-white p-5 rounded-lg shadow-sm border border-pathcycle-gray-100">
+                        <h3 class="text-sm font-medium text-pathcycle-gray-400 uppercase tracking-wider">Conectividad</h3>
+                        <div class="flex items-center gap-3 mt-1">
+                            <p class="text-3xl font-bold text-pathcycle-gray-800">78%</p>
+                            <!-- Indicador de Progreso Circular (simulado) -->
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background-image: conic-gradient(#10B981 78%, #E2E8F0 0)">
+                                <span class="bg-white w-8 h-8 rounded-full"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Card 4: Distritos Cubiertos -->
+                    <div class="bg-white p-5 rounded-lg shadow-sm border border-pathcycle-gray-100">
+                        <h3 class="text-sm font-medium text-pathcycle-gray-400 uppercase tracking-wider">Distritos Cubiertos</h3>
+                        <div class="flex justify-between items-end mt-1">
+                            <p class="text-3xl font-bold text-pathcycle-gray-800">34/43</p>
+                            <!-- Gráfico de barras pequeño (simulado) -->
+                            <div class="flex items-end gap-1 h-8">
+                                <div class="w-2 bg-pathcycle-gray-100" style="height: 40%"></div>
+                                <div class="w-2 bg-pathcycle-gray-100" style="height: 70%"></div>
+                                <div class="w-2 bg-pathcycle-secondary" style="height: 100%"></div>
+                                <div class="w-2 bg-pathcycle-secondary" style="height: 80%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Sección del Mapa Grande -->
+                <section class="bg-white rounded-lg shadow-sm border border-pathcycle-gray-100 h-[60vh] flex flex-col">
+                    <!-- Placeholder para Mapa Interactivo -->
+                    <div class="relative w-full flex-1 rounded-lg m-1 bg-pathcycle-gray-100 overflow-hidden">
+                        
+                        <!-- Controles del Mapa -->
+                        <div class="absolute top-3 left-3 z-10 bg-white p-1 rounded-lg shadow-sm border border-pathcycle-gray-100">
+                            <button class="w-8 h-8 flex items-center justify-center text-pathcycle-gray-800 hover:bg-pathcycle-gray-50 rounded">
+                                <i data-lucide="layers"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="absolute top-3 right-3 z-10 flex flex-col gap-1">
+                            <button class="w-8 h-8 flex items-center justify-center bg-white text-pathcycle-gray-800 hover:bg-pathcycle-gray-50 rounded-t-lg shadow-sm border border-pathcycle-gray-100">
+                                <i data-lucide="plus"></i>
+                            </button>
+                            <button class="w-8 h-8 flex items-center justify-center bg-white text-pathcycle-gray-800 hover:bg-pathcycle-gray-50 rounded-b-lg shadow-sm border border-pathcycle-gray-100">
+                                <i data-lucide="minus"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Leyenda -->
+                        <div class="absolute bottom-3 left-3 z-10 bg-white p-3 rounded-lg shadow-sm border border-pathcycle-gray-100 w-48">
+                            <h4 class="font-bold text-xs mb-2">Leyenda</h4>
+                            <ul class="space-y-1.5">
+                                <li class="flex items-center gap-2">
+                                    <span class="h-1 w-4 bg-pathcycle-secondary rounded-full"></span>
+                                    <span class="text-xs text-pathcycle-gray-800">Conectada</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="h-1 w-4 bg-pathcycle-danger rounded-full"></span>
+                                    <span class="text-xs text-pathcycle-gray-800">Aislada</span>
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="h-1 w-4 border-t-2 border-dashed border-pathcycle-primary"></span>
+                                    <span class="text-xs text-pathcycle-gray-800">Propuesta</span>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Texto del Placeholder -->
+                        <div class="flex items-center justify-center h-full">
+                            <span class="text-lg font-medium text-pathcycle-gray-400">[ Placeholder para Mapa Interactivo de Lima ]</span>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Sección Inferior (Tabla y Acciones Rápidas) -->
+                <section class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                    
+                    <!-- Izquierda: Tabla "Componentes Más Grandes" -->
+                    <div class="lg:col-span-3 bg-white p-6 rounded-lg shadow-sm border border-pathcycle-gray-100">
+                        <h2 class="text-lg font-bold text-pathcycle-gray-800 mb-4">Componentes Más Grandes</h2>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead class="border-b border-pathcycle-gray-100 text-xs text-pathcycle-gray-400 uppercase">
+                                    <tr>
+                                        <th class="py-3 pr-3">Componente</th>
+                                        <th class="py-3 px-3">Nodos</th>
+                                        <th class="py-3 px-3">Km</th>
+                                        <th class="py-3 pl-3">Distritos</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Fila de datos 1 -->
+                                    <tr class="border-b border-pathcycle-gray-100">
+                                        <td class="py-3 pr-3 font-medium">Red Principal Costa Verde</td>
+                                        <td class="py-3 px-3">128</td>
+                                        <td class="py-3 px-3">45.2</td>
+                                        <td class="py-3 pl-3">Miraflores, Barranco, Chorrillos</td>
+                                    </tr>
+                                    <!-- Fila de datos 2 -->
+                                    <tr class="border-b border-pathcycle-gray-100">
+                                        <td class="py-3 pr-3 font-medium">Eje Arequipa</td>
+                                        <td class="py-3 px-3">76</td>
+                                        <td class="py-3 px-3">12.8</td>
+                                        <td class="py-3 pl-3">Cercado, Lince, San Isidro</td>
+                                    </tr>
+                                    <!-- Fila de datos 3 -->
+                                    <tr class="border-b border-pathcycle-gray-100">
+                                        <td class="py-3 pr-3 font-medium">Interdistrital Norte</td>
+                                        <td class="py-3 px-3">54</td>
+                                        <td class="py-3 px-3">9.1</td>
+                                        <td class="py-3 pl-3">Los Olivos, Independencia</td>
+                                    </tr>
+                                    <!-- Fila de datos 4 -->
+                                    <tr class="border-b border-pathcycle-gray-100">
+                                        <td class="py-3 pr-3 font-medium">Componente San Juan L.</td>
+                                        <td class="py-3 px-3">32</td>
+                                        <td class="py-3 px-3">6.5</td>
+                                        <td class="py-3 pl-3">San Juan de Lurigancho</td>
+                                    </tr>
+                                    <!-- Fila de datos 5 -->
+                                    <tr class="">
+                                        <td class="py-3 pr-3 font-medium">Componente Ate</td>
+                                        <td class="py-3 px-3">21</td>
+                                        <td class="py-3 px-3">4.3</td>
+                                        <td class="py-3 pl-3">Ate</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Derecha: Panel "Acciones Rápidas" -->
+                    <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-sm border border-pathcycle-gray-100">
+                        <h2 class="text-lg font-bold text-pathcycle-gray-800 mb-4">Acciones Rápidas</h2>
+                        <div class="flex flex-col gap-4">
+                            <!-- Botón Primario (Teal) -->
+                            <button class="w-full text-left flex items-center gap-3 py-3 px-4 bg-pathcycle-primary text-white font-medium rounded-lg shadow-sm hover:bg-opacity-90 transition-all">
+                                <i data-lucide="calculator" class="w-5 h-5"></i>
+                                <span>Calcular Ruta Óptima</span>
+                            </button>
+                            <!-- Botón Secundario (Verde) -->
+                            <button class="w-full text-left flex items-center gap-3 py-3 px-4 bg-pathcycle-secondary text-white font-medium rounded-lg shadow-sm hover:bg-opacity-90 transition-all">
+                                <i data-lucide="link" class="w-5 h-5"></i>
+                                <span>Proponer Conexiones</span>
+                            </button>
+                            <!-- Botón Acento (Ámbar) -->
+                            <button class="w-full text-left flex items-center gap-3 py-3 px-4 bg-pathcycle-accent text-white font-medium rounded-lg shadow-sm hover:bg-opacity-90 transition-all">
+                                <i data-lucide="printer" class="w-5 h-5"></i>
+                                <span>Generar Reporte</span>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+            <!-- FIN: Área de Contenido Principal -->
+            
+        </div>
+        <!-- FIN: Wrapper de Contenido Principal -->
+        
+    </div>
+
+    <!-- Script para inicializar Lucide Icons -->
+    <script>
+        lucide.createIcons();
+    </script>
+
+</body>
+</html>

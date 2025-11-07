@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PathCycle - Generador de Reportes</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Estilo de fuente base como respaldo -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Estilo para los radio/checkbox personalizados */
+        input[type="radio"]:checked, input[type="checkbox"]:checked {
+            background-color: #0891B2; /* pathcycle-primary */
+            border-color: #0891B2;
+        }
+    </style>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Configuración personalizada de Tailwind (Método de Objeto JS) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        /* Paleta de colores de la guía de estilo */
+                        'pathcycle-primary': '#0891B2',   /* Deep teal/cyan */
+                        'pathcycle-secondary': '#10B981', /* Vibrant green */
+                        'pathcycle-accent': '#F59E0B',    /* Amber */
+                        'pathcycle-danger': '#EF4444',    /* Red */
+                        'pathcycle-sidebar': '#0F766E',   /* Dark teal (específico del dashboard) */
+                        'pathcycle-gray': {
+                            50: '#F8FAFC',   /* Light gray panels */
+                            100: '#E2E8F0',
+                            200: '#CBD5E1',
+                            400: '#64748B',
+                            800: '#1E293B',
+                        },
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    },
+                    borderRadius: {
+                        /* 8px border radius */
+                        'lg': '8px',
+                    },
+                    boxShadow: {
+                        /* Subtle shadows */
+                        'sm': '0 1px 3px rgba(0,0,0,0.1)',
+                        'xl': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                        '2xl': '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+                    }
+                }
+            }
+        }
+    </script>
+    
+</head>
+<body class="bg-pathcycle-gray-50 text-pathcycle-gray-800 font-sans antialiased">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- INICIO: Sidebar Izquierdo (PROMPT 2) -->
+        <aside class="w-60 bg-pathcycle-sidebar text-white flex flex-col flex-shrink-0">
+            
+            <!-- Logo -->
+            <div class="h-16 flex items-center justify-center px-4 gap-2 border-b border-white/10">
+                <i data-lucide="bike" class="w-7 h-7"></i>
+                <span class="text-2xl font-bold tracking-tight">PathCycle</span>
+            </div>
+            
+            <!-- Menú de Navegación -->
+            <nav class="flex-1 p-4 space-y-2">
+                <ul class="space-y-1">
+                    <!-- Estado Inactivo (Dashboard) -->
+                    <li>
+                        <a href="index.html" class="flex items-center gap-3 p-3 rounded-lg text-white/70 hover:bg-white/10 hover:text-white font-medium transition-colors">
+                            <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <!-- Estado Inactivo (Análisis de Red) -->
+                    <li>
+                        <a href="analisis-red.html" class="flex items-center gap-3 p-3 rounded-lg text-white/70 hover:bg-white/10 hover:text-white font-medium transition-colors">
+                            <i data-lucide="map" class="w-5 h-5"></i>
+                            <span>Análisis de Red</span>
+                        </a>
+                    </li>
+                    <!-- Estado Inactivo (Simulador) -->
+                    <li>
+                        <a href="simulador.html" class="flex items-center gap-3 p-3 rounded-lg text-white/70 hover:bg-white/10 hover:text-white font-medium transition-colors">
+                            <i data-lucide="rotate-cw" class="w-5 h-5"></i>
+                            <span>Simulador</span>
+                        </a>
+                    </li>
+                    <!-- Estado Activo (Reportes) -->
+                    <li>
+                        <a href="reportes.html" class="flex items-center gap-3 p-3 rounded-lg bg-white/20 text-white font-medium">
+                            <i data-lucide="file-text" class="w-5 h-5"></i>
+                            <span>Reportes</span>
+                        </a>
+                    </li>
+                    <!-- NUEVO ITEM: Ruta Óptima -->
+                    <li>
+                        <a href="ruta-optima.html" class="flex items-center gap-3 p-3 rounded-lg text-white/70 hover:bg-white/10 hover:text-white font-medium transition-colors">
+                            <i data-lucide="route" class="w-5 h-5"></i>
+                            <span>Ruta Óptima</span>
+                        </a>
+                    </li>
+                    <!-- FIN NUEVO ITEM -->
+                    <li>
+                        <a href="configuracion.html" class="flex items-center gap-3 p-3 rounded-lg text-white/70 hover:bg-white/10 hover:text-white font-medium transition-colors">
+                            <i data-lucide="settings" class="w-5 h-5"></i>
+                            <span>Configuración</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <!-- Perfil de Usuario -->
+            <div class="p-4 border-t border-white/10">
+                <div class="flex items-center gap-3">
+                    <img src="https://placehold.co/40x40/E2E8F0/64748B?text=UP" class="w-10 h-10 rounded-full" alt="User Avatar">
+                    <div>
+                        <p class="text-sm font-medium">Usuario Planificador</p>
+                        <p class="text-xs text-white/70">Municipalidad de Lima</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+        <!-- FIN: Sidebar Izquierdo -->
+
+        <!-- INICIO: Wrapper de Contenido Principal -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            
+            <!-- INICIO: Barra Superior (PROMPT 5 - Breadcrumb actualizado) -->
+            <header class="bg-white border-b border-pathcycle-gray-100 h-16 flex-shrink-0 flex items-center justify-between px-6">
+                
+                <!-- Breadcrumb -->
+                <div>
+                    <span class="text-sm text-pathcycle-gray-400">Dashboard /</span>
+                    <span class="text-sm font-medium text-pathcycle-gray-800">Generador de Reportes</span>
+                </div>
+                
+                <!-- Barra de Búsqueda -->
+                <div class="w-full max-w-sm relative">
+                    <input type="text" placeholder="Buscar reporte, plantilla..." class="w-full pl-10 pr-4 py-2 text-sm bg-pathcycle-gray-50 border border-pathcycle-gray-200 rounded-lg focus:ring-2 focus:ring-pathcycle-primary/50 focus:border-pathcycle-primary outline-none">
+                    <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-pathcycle-gray-400"></i>
+                </div>
+                
+                <!-- Iconos y Menú de Usuario -->
+                <div class="flex items-center gap-4">
+                    <button class="relative text-pathcycle-gray-400 hover:text-pathcycle-gray-800 transition-colors">
+                        <i data-lucide="bell" class="w-5 h-5"></i>
+                        <span class="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-pathcycle-danger ring-1 ring-white"></span>
+                    </button>
+                    
+                    <button class="flex items-center gap-2">
+                        <img src="https://placehold.co/32x32/E2E8F0/64748B?text=UP" class="w-8 h-8 rounded-full" alt="User Avatar">
+                        <span class="hidden md:block text-sm font-medium">Usuario...</span>
+                        <i data-lucide="chevron-down" class="w-4 h-4 text-pathcycle-gray-400"></i>
+                    </button>
+                </div>
+            </header>
+            <!-- FIN: Barra Superior -->
+
+            <!-- INICIO: Área de Contenido Principal (PROMPT 5) -->
+            <main class="flex-1 overflow-y-auto p-6 space-y-6">
+                
+                <!-- INICIO: Sección Superior (Título) -->
+                <div>
+                    <h1 class="text-2xl font-bold text-pathcycle-gray-800">Generación de Reportes Técnicos</h1>
+                    <p class="text-pathcycle-gray-400">Configure y genere informes detallados sobre la red de ciclovías.</p>
+                </div>
+                <!-- FIN: Sección Superior -->
+                
+                <!-- INICIO: Layout 40/60 (Configuración y Vista Previa) -->
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                    
+                    <!-- Lado Izquierdo: Configuración del Reporte (40%) -->
+                    <div class="lg:col-span-2 bg-white rounded-lg shadow-sm border border-pathcycle-gray-100 flex flex-col h-fit">
+                        <div class="p-6 border-b border-pathcycle-gray-100">
+                             <h2 class="text-base font-bold text-pathcycle-gray-800 uppercase">Configuración del Reporte</h2>
+                        </div>
+                        <div class="p-6 space-y-6">
+                            <!-- Sección 1: Tipo de Reporte -->
+                            <div class="space-y-3">
+                                <h3 class="text-sm font-bold text-pathcycle-gray-800">1. Tipo de Reporte</h3>
+                                <div class="space-y-2">
+                                    <label class="flex items-center gap-2 p-3 rounded-lg border border-pathcycle-gray-100 hover:bg-pathcycle-gray-50 transition-all">
+                                        <input type="radio" name="report_type" class="w-4 h-4 text-pathcycle-primary focus:ring-pathcycle-primary/50">
+                                        <span class="text-sm">Análisis completo de red actual</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 p-3 rounded-lg border border-pathcycle-gray-100 hover:bg-pathcycle-gray-50 transition-all">
+                                        <input type="radio" name="report_type" class="w-4 h-4 text-pathcycle-primary focus:ring-pathcycle-primary/50">
+                                        <span class="text-sm">Evaluación de escenario propuesto</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 p-3 rounded-lg border border-pathcycle-gray-100 hover:bg-pathcycle-gray-50 transition-all">
+                                        <input type="radio" name="report_type" class="w-4 h-4 text-pathcycle-primary focus:ring-pathcycle-primary/50">
+                                        <span class="text-sm">Comparación de múltiples escenarios</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 p-3 rounded-lg border border-pathcycle-gray-100 hover:bg-pathcycle-gray-50 transition-all">
+                                        <input type="radio" name="report_type" class="w-4 h-4 text-pathcycle-primary focus:ring-pathcycle-primary/50">
+                                        <span class="text-sm">Informe de priorización de inversiones</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- Sección 2: Contenido a Incluir -->
+                            <div class="space-y-3">
+                                <h3 class="text-sm font-bold text-pathcycle-gray-800">2. Contenido a Incluir</h3>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <label class="flex items-center gap-2 text-sm">
+                                        <input type="checkbox" checked class="w-4 h-4 rounded text-pathcycle-primary focus:ring-pathcycle-primary/50">
+                                        <i data-lucide="file-check-2" class="w-4 h-4 text-pathcycle-gray-400"></i> Resumen ejecutivo
+                                    </label>
+                                    <label class="flex items-center gap-2 text-sm">
+                                        <input type="checkbox" checked class="w-4 h-4 rounded text-pathcycle-primary focus:ring-pathcycle-primary/50">
+                                        <i data-lucide="binary" class="w-4 h-4 text-pathcycle-gray-400"></i> Métricas algorítmicas
+                                    </label>
+                                    <label class="flex items-center gap-2 text-sm">
+                                        <input type="checkbox" checked class="w-4 h-4 rounded text-pathcycle-primary focus:ring-pathcycle-primary/50">
+                                        <i data-lucide="map" class="w-4 h-4 text-pathcycle-gray-400"></i> Visualizaciones de mapas
+                                    </label>
+                                    <label class="flex items-center gap-2 text-sm">
+                                        <input type="checkbox" checked class="w-4 h-4 rounded text-pathcycle-primary focus:ring-pathcycle-primary/50">
+                                        <i data-lucide="bar-chart-3" class="w-4 h-4 text-pathcycle-gray-400"></i> Gráficos de conectividad
+                                    </label>
+                                    <label class="flex items-center gap-2 text-sm">
+                                        <input type="checkbox" class="w-4 h-4 rounded text-pathcycle-primary focus:ring-pathcycle-primary/50">
+                                        <i data-lucide="car" class="w-4 h-4 text-pathcycle-gray-400"></i> Análisis de tráfico
+                                    </label>
+                                    <label class="flex items-center gap-2 text-sm">
+                                        <input type="checkbox" class="w-4 h-4 rounded text-pathcycle-primary focus:ring-pathcycle-primary/50">
+                                        <i data-lucide="alert-triangle" class="w-4 h-4 text-pathcycle-gray-400"></i> Análisis de accidentes
+                                    </label>
+                                    <label class="flex items-center gap-2 text-sm">
+                                        <input type="checkbox" checked class="w-4 h-4 rounded text-pathcycle-primary focus:ring-pathcycle-primary/50">
+                                        <i data-lucide="list-checks" class="w-4 h-4 text-pathcycle-gray-400"></i> Propuestas priorizadas
+                                    </label>
+                                    <label class="flex items-center gap-2 text-sm">
+                                        <input type="checkbox" checked class="w-4 h-4 rounded text-pathcycle-primary focus:ring-pathcycle-primary/50">
+                                        <i data-lucide="dollar-sign" class="w-4 h-4 text-pathcycle-gray-400"></i> Estimación de costos
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Sección 3: Filtros Geográficos -->
+                            <div class="space-y-3">
+                                <h3 class="text-sm font-bold text-pathcycle-gray-800">3. Filtros Geográficos</h3>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-medium text-pathcycle-gray-400 mb-1">Distritos a incluir</label>
+                                        <button class="w-full flex justify-between items-center text-left py-2 px-3 text-sm bg-pathcycle-gray-50 border border-pathcycle-gray-200 rounded-lg focus:ring-2 focus:ring-pathcycle-primary/50 focus:border-pathcycle-primary outline-none">
+                                            <span>Todos seleccionados (43)</span>
+                                            <i data-lucide="chevron-down" class="w-4 h-4 text-pathcycle-gray-400"></i>
+                                        </button>
+                                    </div>
+                                     <div>
+                                        <label class="block text-xs font-medium text-pathcycle-gray-400 mb-1">Período de análisis</label>
+                                        <input type="text" value="01/01/2025 - 31/10/2025" class="w-full py-2 px-3 text-sm bg-pathcycle-gray-50 border border-pathcycle-gray-200 rounded-lg focus:ring-2 focus:ring-pathcycle-primary/50 focus:border-pathcycle-primary outline-none">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Sección 4: Formato de Salida -->
+                             <div class="space-y-3">
+                                <h3 class="text-sm font-bold text-pathcycle-gray-800">4. Formato de Salida</h3>
+                                <div class="space-y-2">
+                                    <label class="flex items-center gap-2 p-3 rounded-lg border border-pathcycle-gray-100 hover:bg-pathcycle-gray-50 transition-all">
+                                        <input type="radio" name="format_type" class="w-4 h-4 text-pathcycle-primary focus:ring-pathcycle-primary/50">
+                                        <span class="text-sm">PDF ejecutivo (formato compacto)</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 p-3 rounded-lg border-2 border-pathcycle-primary bg-pathcycle-primary/5 transition-all">
+                                        <input type="radio" name="format_type" checked class="w-4 h-4 text-pathcycle-primary focus:ring-pathcycle-primary/50">
+                                        <span class="text-sm font-medium text-pathcycle-primary">PDF técnico completo (formato detallado)</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 p-3 rounded-lg border border-pathcycle-gray-100 hover:bg-pathcycle-gray-50 transition-all">
+                                        <input type="radio" name="format_type" class="w-4 h-4 text-pathcycle-primary focus:ring-pathcycle-primary/50">
+                                        <span class="text-sm">Excel con datos raw</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 p-3 rounded-lg border border-pathcycle-gray-100 hover:bg-pathcycle-gray-50 transition-all">
+                                        <input type="radio" name="format_type" class="w-4 h-4 text-pathcycle-primary focus:ring-pathcycle-primary/50">
+                                        <span class="text-sm">Presentación PowerPoint</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <button class="text-sm font-medium text-pathcycle-primary hover:underline">
+                                <i data-lucide="settings-2" class="inline w-4 h-4 mr-1"></i>
+                                Opciones Avanzadas
+                            </button>
+                        </div>
+                        
+                        <!-- Botón de Generar -->
+                        <div class="p-6 mt-4 border-t border-pathcycle-gray-100 bg-pathcycle-gray-50 rounded-b-lg">
+                            <button class="w-full py-3 px-5 bg-pathcycle-primary text-white text-base font-bold rounded-lg shadow-sm hover:bg-opacity-90 transition-all">
+                                <i data-lucide="file-text" class="inline w-5 h-5 mr-2 -mt-1"></i>
+                                GENERAR REPORTE
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Lado Derecho: Vista Previa (60%) -->
+                    <div class="lg:col-span-3">
+                        <div class="bg-pathcycle-gray-100 rounded-lg p-6 border border-pathcycle-gray-200 h-full">
+                            <h2 class="text-base font-bold text-pathcycle-gray-800 uppercase mb-4">Vista Previa</h2>
+                            
+                            <!-- Controles del PDF -->
+                            <div class="flex justify-between items-center bg-pathcycle-gray-800 text-white rounded-t-lg p-3">
+                                <div class="flex items-center gap-3">
+                                    <button class="hover:text-pathcycle-gray-200"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
+                                    <span class="text-sm">Página <input type="text" value="3" class="w-8 text-center bg-pathcycle-gray-800 focus:bg-pathcycle-gray-400 outline-none rounded"> de 24</span>
+                                    <button class="hover:text-pathcycle-gray-200"><i data-lucide="chevron-right" class="w-5 h-5"></i></button>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <button class="hover:text-pathcycle-gray-200"><i data-lucide="zoom-out" class="w-5 h-5"></i></button>
+                                    <span class="text-sm font-medium">100%</span>
+                                    <button class="hover:text-pathcycle-gray-200"><i data-lucide="zoom-in" class="w-5 h-5"></i></button>
+                                </div>
+                            </div>
+                            
+                            <!-- Simulación de Páginas Apiladas -->
+                            <div class="relative">
+                                <!-- Página Falsa 2 (Sombra) -->
+                                <div class="absolute top-2 left-0 w-full h-full rounded-b-lg bg-pathcycle-gray-200 z-0 transform translate-x-1 translate-y-1"></div>
+                                <!-- Página Falsa 1 (Sombra) -->
+                                <div class="absolute top-1 left-0 w-full h-full rounded-b-lg bg-pathcycle-gray-200 z-0"></div>
+                                
+                                <!-- Página Real (Contenido) -->
+                                <div class="relative bg-white shadow-xl h-[600px] overflow-y-auto z-10 rounded-b-lg border-x border-b border-pathcycle-gray-200">
+                                    <!-- Portada (Simulada) -->
+                                    <div class="p-10 border-b border-pathcycle-gray-100 h-[600px] flex flex-col justify-center items-center text-center">
+                                        <i data-lucide="bike" class="w-16 h-16 text-pathcycle-primary"></i>
+                                        <h1 class="text-3xl font-bold mt-4">Análisis Técnico de Red de Ciclovías</h1>
+                                        <p class="text-lg text-pathcycle-gray-400 mt-1">Lima Metropolitana - Octubre 2025</p>
+                                    </div>
+                                    <!-- Página 1 (Resumen) -->
+                                    <div class="p-10 border-b border-pathcycle-gray-100 h-[600px]">
+                                        <h2 class="text-xl font-bold border-b pb-2 mb-4">1. Resumen Ejecutivo</h2>
+                                        <p class="text-sm text-pathcycle-gray-400">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet...</p>
+                                        <div class="grid grid-cols-2 gap-4 mt-6">
+                                            <div class="bg-pathcycle-gray-50 p-4 rounded-lg border border-pathcycle-gray-100">
+                                                <p class="text-xs text-pathcycle-gray-400">Conectividad Total</p>
+                                                <p class="text-2xl font-bold text-pathcycle-primary">78%</p>
+                                            </div>
+                                            <div class="bg-pathcycle-gray-50 p-4 rounded-lg border border-pathcycle-gray-100">
+                                                <p class="text-xs text-pathcycle-gray-400">Componentes Conexas</p>
+                                                <p class="text-2xl font-bold text-pathcycle-danger">47</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Página 2 (Mapa) -->
+                                    <div class="p-10 border-b border-pathcycle-gray-100 h-[600px]">
+                                        <h2 class="text-xl font-bold border-b pb-2 mb-4">2. Visualización de Mapas</h2>
+                                        <div class="h-96 bg-pathcycle-gray-100 rounded-lg flex items-center justify-center text-pathcycle-gray-400">
+                                            [Placeholder de Mapa]
+                                        </div>
+                                    </div>
+                                    <!-- Página 3 (Gráficos) -->
+                                    <div class="p-10 border-b border-pathcycle-gray-100 h-[600px]">
+                                        <h2 class="text-xl font-bold border-b pb-2 mb-4">3. Gráficos de Conectividad</h2>
+                                        <div class="h-96 bg-pathcycle-gray-100 rounded-lg flex items-center justify-center text-pathcycle-gray-400">
+                                            [Placeholder de Gráfico de Barras]
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- FIN: Layout 40/60 -->
+                
+                <!-- INICIO: Sección Inferior (Reportes Recientes) -->
+                <div class="bg-white rounded-lg shadow-sm border border-pathcycle-gray-100">
+                    <div class="p-4 border-b border-pathcycle-gray-100">
+                        <h2 class="text-base font-bold text-pathcycle-gray-800 uppercase">Reportes Generados Recientemente</h2>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="border-b border-pathcycle-gray-100 text-xs text-pathcycle-gray-400 uppercase">
+                                <tr>
+                                    <th class="py-3 px-5">Nombre</th>
+                                    <th class="py-3 px-5">Fecha</th>
+                                    <th class="py-3 px-5">Tipo</th>
+                                    <th class="py-3 px-5">Tamaño</th>
+                                    <th class="py-3 px-5">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-pathcycle-gray-100">
+                                <!-- Fila 1 -->
+                                <tr>
+                                    <td class="py-3 px-5 font-medium">Análisis Q4 2025</td>
+                                    <td class="py-3 px-5 text-pathcycle-gray-400">20/10/2025</td>
+                                    <td class="py-3 px-5"><span class="text-xs font-medium px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">PDF Técnico</span></td>
+                                    <td class="py-3 px-5 text-pathcycle-gray-400">8.4 MB</td>
+                                    <td class="py-3 px-5">
+                                        <div class="flex items-center gap-2">
+                                            <button class="p-1 text-pathcycle-primary hover:bg-pathcycle-primary/10 rounded-full"><i data-lucide="download" class="w-4 h-4"></i></button>
+                                            <button class="p-1 text-pathcycle-gray-400 hover:bg-pathcycle-gray-100 rounded-full"><i data-lucide="eye" class="w-4 h-4"></i></button>
+                                            <button class="p-1 text-pathcycle-danger hover:bg-pathcycle-danger/10 rounded-full"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- Fila 2 -->
+                                <tr>
+                                    <td class="py-3 px-5 font-medium">Escenario A vs B</td>
+                                    <td class="py-3 px-5 text-pathcycle-gray-400">18/10/2025</td>
+                                    <td class="py-3 px-5"><span class="text-xs font-medium px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">PDF Ejecutivo</span></td>
+                                    <td class="py-3 px-5 text-pathcycle-gray-400">2.1 MB</td>
+                                    <td class="py-3 px-5">
+                                        <div class="flex items-center gap-2">
+                                            <button class="p-1 text-pathcycle-primary hover:bg-pathcycle-primary/10 rounded-full"><i data-lucide="download" class="w-4 h-4"></i></button>
+                                            <button class="p-1 text-pathcycle-gray-400 hover:bg-pathcycle-gray-100 rounded-full"><i data-lucide="eye" class="w-4 h-4"></i></button>
+                                            <button class="p-1 text-pathcycle-danger hover:bg-pathcycle-danger/10 rounded-full"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- Fila 3 -->
+                                <tr>
+                                    <td class="py-3 px-5 font-medium">Datos Crudos - San Isidro</td>
+                                    <td class="py-3 px-5 text-pathcycle-gray-400">17/10/2025</td>
+                                    <td class="py-3 px-5"><span class="text-xs font-medium px-2 py-0.5 rounded-full bg-green-100 text-green-700">Excel</span></td>
+                                    <td class="py-3 px-5 text-pathcycle-gray-400">12.2 MB</td>
+                                    <td class="py-3 px-5">
+                                        <div class="flex items-center gap-2">
+                                            <button class="p-1 text-pathcycle-primary hover:bg-pathcycle-primary/10 rounded-full"><i data-lucide="download" class="w-4 h-4"></i></button>
+                                            <button class="p-1 text-pathcycle-gray-400 hover:bg-pathcycle-gray-100 rounded-full"><i data-lucide="eye" class="w-4 h-4"></i></button>
+                                            <button class="p-1 text-pathcycle-danger hover:bg-pathcycle-danger/10 rounded-full"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Paginación de la Tabla -->
+                    <div class="flex justify-between items-center p-4 border-t border-pathcycle-gray-100">
+                        <span class="text-sm text-pathcycle-gray-400">Mostrando 1-3 de 12 reportes</span>
+                        <div class="flex items-center gap-1">
+                            <button class="py-1 px-2 text-sm text-pathcycle-gray-400 rounded-lg hover:bg-pathcycle-gray-100">Previo</button>
+                            <button class="py-1 px-2 text-sm text-white bg-pathcycle-primary rounded-lg">1</button>
+                            <button class_name="py-1 px-2 text-sm text-pathcycle-gray-400 rounded-lg hover:bg-pathcycle-gray-100">2</button>
+                            <button class="py-1 px-2 text-sm text-pathcycle-gray-400 rounded-lg hover:bg-pathcycle-gray-100">Siguiente</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- FIN: Sección Inferior -->
+
+            </main>
+            <!-- FIN: Área de Contenido Principal -->
+            
+        </div>
+        <!-- FIN: Wrapper de Contenido Principal -->
+        
+    </div>
+
+    <!-- Script para inicializar Lucide Icons -->
+    <script>
+        lucide.createIcons();
+    </script>
+
+</body>
+</html>
