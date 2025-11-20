@@ -38,6 +38,7 @@ export default function Header({ currentPage }: HeaderProps) {
 
       {/* Right Actions */}
       <div className="flex items-center gap-4">
+        {/* Ruta Óptima button removed from header to avoid affecting layout; open from the Ruta Óptima page instead */}
         <button className="relative text-pathcycle-gray-400 hover:text-pathcycle-gray-800 transition-colors">
           <Bell className="w-5 h-5" />
           <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-pathcycle-danger ring-1 ring-white"></span>

@@ -30,6 +30,31 @@ export default function GraphVisualization({ data, onNodeSelect }: GraphVisualiz
   const [sampleData, setSampleData] = useState(sample)
   const graphData = data ?? sampleData
 
+  // Build a color map for node groups: start with NODE_COLORS and add generated colors
+  const buildColorMap = (): Record<string, string> => {
+    // start with a shallow copy of predefined colors
+    const map: Record<string, string> = { ...NODE_COLORS }
+    const groups = Array.from(new Set((graphData.nodes || []).map((n: any) => String(n.group ?? 'default'))))
+
+    // collect groups that need a generated color (not present in NODE_COLORS and not 'default')
+    const dynamic = groups.filter(g => g !== 'default' && !(g in map))
+    if (dynamic.length === 0) return map
+
+    // generate visually distinct colors using HSL
+    const generate = (i: number, total: number) => {
+      const hue = Math.round((i * 360) / total)
+      return `hsl(${hue} 75% 50%)`
+    }
+
+    dynamic.forEach((g, i) => {
+      map[g] = generate(i, dynamic.length)
+    })
+
+    return map
+  }
+
+  const colorMap = buildColorMap()
+
   useEffect(() => {
     // Load sample data if no data prop provided
     if (!data) {
@@ -140,7 +165,10 @@ export default function GraphVisualization({ data, onNodeSelect }: GraphVisualiz
               const label = node.name ?? node.id
               const fontSize = 12 / globalScale
               const size = (node.val ?? 2) * (node.id === selected ? 6 : 4)
-              const color = node.id === selected ? "#ff8c00" : NODE_COLORS[node.group?.toString() ?? 'default']
+              const groupKey = String(node.group ?? 'default')
+              const color = node.id === selected
+                ? "#ff8c00"
+                : (colorMap[groupKey] ?? colorMap['default'])
 
               ctx.beginPath()
               ctx.arc(node.x, node.y, size, 0, 2 * Math.PI, false)

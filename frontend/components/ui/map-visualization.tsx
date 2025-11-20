@@ -11,6 +11,10 @@ export interface MapVisualizationRef {
   zoomIn: () => void;
   zoomOut: () => void;
   resetZoom: () => void;
+  resize: () => void;
+  drawRoute: (coords: number[][]) => void;
+  clearRoute: () => void;
+  fitToBounds: (coords: number[][], padding?: number) => void;
 }
 
 interface MapVisualizationProps {
@@ -49,6 +53,9 @@ export const MapVisualization = forwardRef<MapVisualizationRef, MapVisualization
     const mapContainer = useRef<HTMLDivElement>(null);
     const map = useRef<mapboxgl.Map | null>(null);
     const [mapLoaded, setMapLoaded] = useState(false);
+    const drawAnimRef = useRef<number | null>(null)
+    const animCoordsRef = useRef<number[][] | null>(null)
+    const animStartRef = useRef<number | null>(null)
 
     useEffect(() => {
       if (!mapContainer.current) return;
@@ -125,7 +132,84 @@ export const MapVisualization = forwardRef<MapVisualizationRef, MapVisualization
           zoom: DEFAULT_ZOOM,
           essential: true,
         });
+      },
+      resize: () => {
+        // give the browser a tick to apply layout changes before resizing the map canvas
+        setTimeout(() => map.current?.resize(), 50);
       }
+    ,
+    drawRoute: (coords: number[][]) => {
+      if (!map.current || !mapLoaded) return
+      const sourceId = 'route-source'
+      const layerId = 'route-layer'
+
+      // cancel any running animation
+      if (drawAnimRef.current) {
+        cancelAnimationFrame(drawAnimRef.current)
+        drawAnimRef.current = null
+      }
+
+      animCoordsRef.current = coords
+      animStartRef.current = null
+
+      // ensure source/layer exist
+      if (!map.current.getSource(sourceId)) {
+        map.current.addSource(sourceId, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } as any })
+        map.current.addLayer({
+          id: layerId,
+          type: 'line',
+          source: sourceId,
+          layout: { 'line-join': 'round', 'line-cap': 'round' },
+          paint: { 'line-color': '#FF5722', 'line-width': 6, 'line-opacity': 0.95 }
+        })
+      }
+
+      const src = map.current.getSource(sourceId) as mapboxgl.GeoJSONSource
+
+      // animate by progressively revealing coordinates
+      const duration = 800 // ms
+      const totalPts = coords.length
+
+      const step = (ts: number) => {
+        if (!animStartRef.current) animStartRef.current = ts
+        const elapsed = ts - (animStartRef.current || 0)
+        const t = Math.min(1, elapsed / duration)
+        const count = Math.max(2, Math.floor(t * totalPts))
+        const partial = coords.slice(0, count)
+        const geo = { type: 'FeatureCollection', features: [{ type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: partial } }] }
+        try { src.setData(geo as any) } catch (e) { /* ignore */ }
+
+        if (t < 1) {
+          drawAnimRef.current = requestAnimationFrame(step)
+        } else {
+          drawAnimRef.current = null
+        }
+      }
+
+      drawAnimRef.current = requestAnimationFrame(step)
+    },
+    clearRoute: () => {
+      if (!map.current || !mapLoaded) return
+      const sourceId = 'route-source'
+      const layerId = 'route-layer'
+      if (drawAnimRef.current) {
+        cancelAnimationFrame(drawAnimRef.current)
+        drawAnimRef.current = null
+      }
+      animCoordsRef.current = null
+      animStartRef.current = null
+      if (map.current.getLayer(layerId)) {
+        try { map.current.removeLayer(layerId) } catch {}
+      }
+      if (map.current.getSource(sourceId)) {
+        try { map.current.removeSource(sourceId) } catch {}
+      }
+    },
+    fitToBounds: (coords: number[][], padding = 40) => {
+      if (!map.current || !mapLoaded || !coords || coords.length === 0) return
+      const bounds = coords.reduce((b, c) => b.extend(c as [number, number]), new mapboxgl.LngLatBounds(coords[0] as [number, number], coords[0] as [number, number]))
+      try { map.current.fitBounds(bounds, { padding, maxZoom: 16, duration: 800 }) } catch (e) { console.warn('fitBounds failed', e) }
+    }
     }), []);
 
     return (

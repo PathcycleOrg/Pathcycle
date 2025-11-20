@@ -25,7 +25,7 @@ export default function Dashboard() {
       </section>
 
       {/* Map Section */}
-      <section className="bg-white rounded-lg shadow-sm border border-pathcycle-gray-100 h-96">
+      <section className="bg-white rounded-lg shadow-sm border border-pathcycle-gray-100 min-h-96">
         <MapContainer />
       </section>
 

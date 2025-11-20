@@ -125,13 +125,11 @@ git commit -m "feat: descripción del cambio"
 - La aplicación está en desarrollo activo
 - Se recomienda usar Node.js 18+ para evitar problemas de compatibilidad
 - En caso de problemas con las dependencias, intenta borrar `node_modules/` y el archivo de lock antes de reinstalar
-<!--
+
 ## 📄 Licencia
 
 [Tipo de Licencia]
 
 ## 👥 Equipo
 
-
 [Nombres de los miembros del equipo]
--->

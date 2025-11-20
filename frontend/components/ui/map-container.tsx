@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useRef, useState, useEffect } from "react"
 import { Expand, Minimize, Plus, Minus } from "lucide-react"
 import { MapVisualization } from "@/components/ui/map-visualization"
 
@@ -11,6 +11,9 @@ type MapRef = MapVisualizationRef
 export default function MapContainer() {
   const mapRef = useRef<MapRef>(null)
   const [isExpanded, setIsExpanded] = useState(false)
+  // refs for custom left-side drag scrollbar
+  const isDraggingRef = useRef(false)
+  const dragStartYRef = useRef(0)
 
   const SAMPLE_CYCLEWAYS = [
     {
@@ -44,22 +47,118 @@ export default function MapContainer() {
   }
 
   const toggleExpand = () => {
-    setIsExpanded(!isExpanded)
-    // Asegurar que el mapa se redimensione después de la transición y el scroll
-    setTimeout(() => {
-      if (mapRef.current?.zoomIn) {
-        const map = (mapRef.current as any)?._map;
-        if (map && typeof map.resize === 'function') {
-          // Hacer scroll a la posición del mapa si se está expandiendo
-          if (!isExpanded) {
-            const mapElement = document.querySelector('[data-map-container]');
-            mapElement?.scrollIntoView({ behavior: 'smooth' });
+    // Toggle state and schedule a map resize after the CSS transition
+    setIsExpanded((prev) => {
+      const next = !prev
+
+      // After transition completes, ensure map canvas is resized and scroll into view when expanding
+      setTimeout(() => {
+        try {
+          if (next) {
+            const el = document.querySelector('[data-map-container]') as HTMLElement | null
+            el?.scrollIntoView({ behavior: 'smooth', block: 'start' })
           }
-          map.resize();
+        } finally {
+          mapRef.current?.resize()
+        }
+      }, 50)
+
+      return next
+    })
+  }
+
+  // Drag handlers for the left-side scrollbar: scroll the page by the drag delta
+  const onDragStart = (e: React.PointerEvent) => {
+    isDraggingRef.current = true
+    dragStartYRef.current = e.clientY
+    const target = e.target as Element
+    try { target.setPointerCapture?.(e.pointerId) } catch {}
+  }
+
+  const onDragMove = (e: PointerEvent) => {
+    if (!isDraggingRef.current) return
+    const dy = e.clientY - dragStartYRef.current
+    // Scroll the document vertically by the delta; this is simple and responsive
+    window.scrollBy({ top: dy, left: 0, behavior: 'auto' })
+    dragStartYRef.current = e.clientY
+  }
+
+  const onDragEnd = (_e: PointerEvent) => {
+    isDraggingRef.current = false
+  }
+
+  useEffect(() => {
+    document.addEventListener('pointermove', onDragMove)
+    document.addEventListener('pointerup', onDragEnd)
+    document.addEventListener('pointercancel', onDragEnd)
+    return () => {
+      document.removeEventListener('pointermove', onDragMove)
+      document.removeEventListener('pointerup', onDragEnd)
+      document.removeEventListener('pointercancel', onDragEnd)
+    }
+  }, [])
+
+  // Listen for route events and draw polyline on the map when nodes include coordinates
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const ce = e as CustomEvent
+      const payload = ce.detail || {}
+      const nodes: any[] = payload.nodes || []
+      const route: string[] = payload.route || []
+
+      if (!mapRef.current) return
+
+      const findNode = (id: string) => nodes.find(n => String(n.id) === String(id))
+
+      const getCoord = (n: any): [number, number] | null => {
+        if (!n) return null
+        if (Array.isArray(n.coordinates) && n.coordinates.length >= 2) return [Number(n.coordinates[0]), Number(n.coordinates[1])]
+        if (n.geometry && Array.isArray(n.geometry.coordinates)) return [Number(n.geometry.coordinates[0]), Number(n.geometry.coordinates[1])]
+        if (n.lng !== undefined && n.lat !== undefined) return [Number(n.lng), Number(n.lat)]
+        if (n.lon !== undefined && n.lat !== undefined) return [Number(n.lon), Number(n.lat)]
+        if (n.longitude !== undefined && n.latitude !== undefined) return [Number(n.longitude), Number(n.latitude)]
+        if (n.x !== undefined && n.y !== undefined) return [Number(n.x), Number(n.y)]
+        return null
+      }
+
+      const coords: number[][] = []
+      for (const id of route) {
+        const n = findNode(id)
+        const c = getCoord(n)
+        if (c) coords.push(c)
+        else {
+          // missing coord for this node — abort drawing
+          console.warn('Nodo sin coordenadas para ruta:', id, n)
         }
       }
-    }, 300); // Mismo tiempo que la duración de la transición
-  }
+
+      if (coords.length >= 2) {
+        try {
+          mapRef.current.drawRoute(coords)
+          mapRef.current.fitToBounds(coords)
+        } catch (err) {
+          console.error('Error dibujando ruta en mapa', err)
+        }
+      } else {
+        // not enough coordinates — clear any existing route
+        try { mapRef.current.clearRoute() } catch {}
+      }
+    }
+
+    window.addEventListener('pathcycle:use-route', handler as EventListener)
+    window.addEventListener('pathcycle:preview-route', handler as EventListener)
+
+    const clearHandler = () => {
+      try { mapRef.current?.clearRoute() } catch (e) { console.warn('clear route failed', e) }
+    }
+    window.addEventListener('pathcycle:clear-route', clearHandler as EventListener)
+
+    return () => {
+      window.removeEventListener('pathcycle:use-route', handler as EventListener)
+      window.removeEventListener('pathcycle:preview-route', handler as EventListener)
+      window.removeEventListener('pathcycle:clear-route', clearHandler as EventListener)
+    }
+  }, [mapRef])
 
   return (
     <div 
@@ -75,6 +174,19 @@ export default function MapContainer() {
           initialZoom={12}
           className="w-full h-full"
         />
+        {/* Left-side drag scrollbar: small visible track + knob to allow dragging to scroll the page */}
+        <div className="absolute left-0 top-0 h-full z-40 flex items-start pointer-events-auto">
+          <div className="flex items-start h-full" style={{ width: 18 }}>
+            <div className="w-2 bg-pathcycle-gray-100 rounded-r-lg mr-2" style={{ opacity: 0.9 }} />
+            <div
+              role="slider"
+              aria-label="Arrastrar para desplazarse"
+              onPointerDown={onDragStart}
+              className="w-4 h-12 bg-pathcycle-gray-300 rounded-md shadow-inner cursor-grab touch-none"
+              style={{ marginLeft: -18 }}
+            />
+          </div>
+        </div>
       </div>
 
       {/* Map Controls */}

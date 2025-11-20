@@ -142,3 +142,82 @@ body {
 input[type="range"] {
   @apply accent-pathcycle-primary;
 }
+
+/* Interactive cursor & hover dynamics for buttons and actionable items */
+button,
+a[href],
+[role="button"],
+input[type="button"],
+.clickable,
+.interactive,
+.nav-link,
+.menu-item,
+.dropdown-item {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .12s ease, box-shadow .12s ease, background-color .12s ease, color .12s ease;
+}
+
+/* Hover lift and subtle shadow to indicate pressability */
+button:hover,
+a[href]:hover,
+[role="button"]:hover,
+.clickable:hover,
+.interactive:hover,
+.nav-link:hover,
+.menu-item:hover,
+.dropdown-item:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+}
+
+/* Active/pressed state */
+button:active,
+a[href]:active,
+[role="button"]:active,
+.clickable:active,
+.interactive:active {
+  transform: translateY(0) scale(0.995);
+  box-shadow: 0 4px 8px rgba(15, 23, 42, 0.06);
+}
+
+/* Disabled controls should signal not-interactive */
+button[disabled],
+.disabled,
+.is-disabled {
+  cursor: not-allowed !important;
+  opacity: 0.6;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Slight movement for icons inside buttons to add dynamism */
+button svg,
+.btn svg,
+.icon-btn svg {
+  transition: transform .14s ease;
+}
+button:hover svg,
+.btn:hover svg,
+.icon-btn:hover svg {
+  transform: translateX(4px);
+}
+
+/* Focused keyboard-visible outlines */
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.12);
+}
+
+/* Make interactive list items visually obvious */
+li[role="button"],
+.list-item.clickable {
+  cursor: pointer;
+}
+
+/* Utility: apply `interactive` to elements in the markup if you want the full effect */
+.interactive {
+  will-change: transform;
+}
