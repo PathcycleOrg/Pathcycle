@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "maplibre-gl": "^5.13.0"
+  },
+  "devDependencies": {
+    "@types/maplibre-gl": "^1.13.2"
+  }
+}
