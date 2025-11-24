@@ -14,19 +14,24 @@ class CicloviaSchema(BaseModel):
     TIPO_VIA: str
     LONGITUD_KM: str
     FECHA_CORTE: str
+    lat_inicio: Optional[float] = None
+    lon_inicio: Optional[float] = None
+    lat_fin: Optional[float] = None
+    lon_fin: Optional[float] = None
+
 
     class Config:
         orm_mode = True
 
 
 class ReporteAccidenteSchema(BaseModel):
-    DISTRITO: str
-    TIPO_VIA: str
-    TIPO_ACCIDENTE: str
-    NUMERO_HERIDOS: str
-    NUMERO_FALLECIDOS: str
-    FECHA: str
-    HORA: str
+    distrito: str
+    tipo_via: str
+    tipo_accidente: str
+    numero_heridos: str
+    numero_fallecidos: str
+    fecha: str
+    hora: str
 
     class Config:
         orm_mode = True

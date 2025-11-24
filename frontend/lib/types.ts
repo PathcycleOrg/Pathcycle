@@ -3,6 +3,7 @@ export type NodeType = {
   name?: string
   group?: string | number
   val?: number
+  distrito?: string 
 }
 
 export type LinkType = {
@@ -26,4 +27,56 @@ export const NODE_COLORS: Record<string, string> = {
   '4': '#eab308', // Yellow - Mantenimiento
   '5': '#ef4444', // Red - Emergencias
   'default': '#94a3b8' // Gray
+  
+}
+
+// ============================
+// TIPOS DEL BACKEND
+// ============================
+
+export interface Ciclovia {
+  UBIGEO: string;
+  DEPARTAMENTO: string;
+  PROVINCIA: string;
+  DISTRITO: string;
+  CANTIDAD: string;
+  NOMBRE_CICLOVIA: string;
+  TRAMO: string | null;
+  DISTRITO_CICLOVIA: string;
+  TIPO_VIA: string;
+  LONGITUD_KM: string | number | null;
+  FECHA_CORTE: string;
+  lat_inicio: number | string | null;
+  lon_inicio: number | string | null;
+  lat_fin: number | string | null;
+  lon_fin: number | string | null;
+
+
+}
+
+export interface ReporteAccidente {
+  id: number;
+  distrito: string;
+  tipo_via: string;
+  tipo_accidente: string;
+  numero_heridos: number;
+  numero_fallecidos: number;
+  fecha: string;
+  hora: string;
+}
+
+export interface Trafico {
+  id: number;
+  distrito: string;
+  tipo_via: string;
+  intensidad_trafico: string;
+  velocidad_promedio: number;
+  hora_pico: string;
+  fecha: string;
+}
+
+
+export interface NodoCritico {
+  id: string;
+  score: number;
 }
