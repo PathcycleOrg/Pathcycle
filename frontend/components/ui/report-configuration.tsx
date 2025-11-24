@@ -64,7 +64,7 @@ export default function ReportConfiguration() {
       const data = await res.json()
       setPreviewHtml(data.html)
 
-      // Auto-guarda la vista previa generada para que aparezca en "Reportes Generados Recientemente"
+      // Auto-save the generated preview so it appears in "Reportes Generados Recientemente"
       ;(async () => {
         try {
           const title = `${selectedType} - ${new Date().toLocaleString()}`
@@ -80,11 +80,11 @@ export default function ReportConfiguration() {
               window.dispatchEvent(new CustomEvent("reports:updated", { detail: saved }))
             } catch {}
           } else {
-            // no bloqueante: registrar de forma silenciosa
-            console.warn("Auto-guardado de la vista previa falló", r.status, r.statusText)
+            // non-blocking: log silently
+            console.warn("Auto-save preview failed", r.status, r.statusText)
           }
         } catch (e) {
-          console.warn("Error al auto-guardar la vista previa:", e)
+          console.warn("Auto-save preview error:", e)
         }
       })()
     } catch (e) {
@@ -130,12 +130,10 @@ export default function ReportConfiguration() {
       })
       if (!res.ok) throw new Error("Error guardando reporte")
       const data = await res.json()
-      // activar recarga de reportes recientes (emitir evento para que la tabla se recargue)
+      // trigger recent reports refresh (emit event so the table reloads)
       try {
         window.dispatchEvent(new CustomEvent("reports:updated", { detail: { id: data.id } }))
-      } catch {
-        // ignorar
-      }
+      } catch {}
       alert("Reporte guardado (id: " + data.id + ")")
     } catch (e) {
       console.error(e)
@@ -154,7 +152,7 @@ export default function ReportConfiguration() {
         </div>
 
         <div className="p-6 space-y-6">
-          {/* Tipo de reporte */}
+          {/* Report Type */}
           <div className="space-y-3">
             <h3 className="text-sm font-bold text-pathcycle-gray-800">1. Tipo de Reporte</h3>
             <div className="space-y-2">
@@ -232,12 +230,12 @@ export default function ReportConfiguration() {
         </div>
       </div>
 
-      {/* Derecha: Vista previa */}
+      {/* Right: Preview */}
       <div className="lg:col-span-3 bg-pathcycle-gray-100 rounded-lg p-6 border border-pathcycle-gray-200">
         <h2 className="text-base font-bold text-pathcycle-gray-800 uppercase mb-4">Vista Previa</h2>
         <div className="bg-white shadow-xl rounded-lg border border-pathcycle-gray-200 overflow-hidden h-[620px]">
           {previewHtml ? (
-            // iframe con srcDoc para mostrar la vista previa retornada por el backend
+            // iframe con srcDoc para mostrar la preview retornada por el backend
             <iframe title="preview" srcDoc={previewHtml} className="w-full h-full border-0" />
           ) : (
             <div className="h-full flex items-center justify-center text-pathcycle-gray-400">[Genera una vista previa para verla aquí]</div>
