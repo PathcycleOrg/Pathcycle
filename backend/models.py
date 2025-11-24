@@ -5,9 +5,8 @@ from .database import Base  # Asegúrate de importar tu Base desde donde la defi
 class Ciclovia(Base):
     __tablename__ = "Ciclovias"
 
-    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-
-    UBIGEO = Column(String(10))
+    # Usamos UBIGEO como clave primaria, ya que no hay columna id.
+    UBIGEO = Column(String(10), primary_key=True, index=True)
 
     DEPARTAMENTO = Column(String(100))
     PROVINCIA = Column(String(100))
@@ -19,10 +18,7 @@ class Ciclovia(Base):
     TIPO_VIA = Column(String(100))
     LONGITUD_KM = Column(String(50))  # Es texto, aunque represente un número
     FECHA_CORTE = Column(String(50))
-    lat_inicio = Column(Float, nullable=True)
-    lon_inicio = Column(Float, nullable=True)
-    lat_fin = Column(Float, nullable=True)
-    lon_fin = Column(Float, nullable=True)
+
 
 
 class ReporteAccidente(Base):
@@ -48,4 +44,4 @@ class Trafico(Base):
     intensidad_trafico = Column(String(50))
     velocidad_promedio = Column(Float)
     hora_pico = Column(String(50))
-    fecha = Column(String(50))
+    fecha = Column(Date)

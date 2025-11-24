@@ -1,6 +1,6 @@
 import { Eye } from "lucide-react"
 
-export interface CriticalNode {
+interface CriticalNode {
   id: string
   location: string
   centrality: number
