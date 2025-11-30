@@ -1,6 +1,7 @@
 # schemas.py
 from pydantic import BaseModel
-from typing import Optional
+from typing import List, Optional
+from datetime import datetime
 
 class CicloviaSchema(BaseModel):
     UBIGEO: str
@@ -44,6 +45,32 @@ class TraficoSchema(BaseModel):
     velocidad_promedio: float
     hora_pico: str
     fecha: str
+
+    class Config:
+        orm_mode = True
+
+
+class ReportRequestSchema(BaseModel):
+    report_type: str                    # "Análisis completo", "Comparación...", "Escenario propuesto"
+    include_summary: bool = True
+    include_metrics: bool = True
+    include_maps: bool = True
+    include_graph: bool = True
+    date_from: Optional[str] = None     # "YYYYMMDD" o "YYYY-MM-DD"
+    date_to: Optional[str] = None
+    districts: Optional[List[str]] = None
+    export_format: Optional[str] = "html"  # html | pdf
+
+class SaveReportRequest(BaseModel):
+    title: str
+    html: str
+    export_format: Optional[str] = "html"
+
+class ReportSavedResponse(BaseModel):
+    id: int
+    title: str
+    export_format: str
+    created_at: datetime
 
     class Config:
         orm_mode = True

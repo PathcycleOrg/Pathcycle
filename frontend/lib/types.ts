@@ -3,7 +3,7 @@ export type NodeType = {
   name?: string
   group?: string | number
   val?: number
-  distrito?: string 
+  
 }
 
 export type LinkType = {
@@ -79,4 +79,37 @@ export interface Trafico {
 export interface NodoCritico {
   id: string;
   score: number;
+}
+
+export interface ReporteGuardado {
+  id: number;
+  title: string;
+  export_format: string;
+  created_at: string;
+}
+
+
+export type ReporteFormato = "html" | "pdf";
+
+
+// ====================================
+// Tipos (TypeScript Interfaces)
+// ====================================
+export interface ReporteItem {
+  id: number;
+  title: string;
+  created_at: string;
+  export_format: "html" | "pdf";
+}
+
+export interface PreviewConfig {
+  report_type: "analisis" | "comparacion" | "escenario";
+  include_summary: boolean;
+  include_metrics: boolean;
+  include_maps: boolean;
+  include_graph: boolean;
+  date_from?: string | null;
+  date_to?: string | null;
+  districts?: string[];
+  export_format?: "html";
 }

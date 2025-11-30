@@ -1,16 +1,23 @@
 # main.py
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends , Body , HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from typing import List, Union
+from typing import List, Union , Optional
+from sqlalchemy.orm import Session
+from datetime import datetime
+import html
 
 from .database import Base, engine, get_db
-from .models import Ciclovia, ReporteAccidente, Trafico
-from .schemas import CicloviaSchema, ReporteAccidenteSchema, TraficoSchema
+from .models import Ciclovia, ReporteAccidente, Trafico , ReportSaved
+from .schemas import CicloviaSchema, ReporteAccidenteSchema, TraficoSchema , ReportRequestSchema, SaveReportRequest, ReportSavedResponse
 
 import math
 import heapq
+import base64
+import tempfile
+import pdfkit  
 
 # ============================================================
 # 1. Haversine
@@ -84,7 +91,7 @@ def dijkstra(graph, start, end):
 # 4. Merge de nodos cercanos (snapping)
 # ============================================================
 
-def merge_close_nodes(nodes, threshold=3):
+def merge_close_nodes(nodes, threshold=15):
     """
     Une nodos que están a menos de 'threshold' metros.
     Retorna:
@@ -155,7 +162,7 @@ def dividir_segmentos_por_intersecciones(segmentos, intersecciones):
             d2 = haversine(inter, p2)
 
             # Si pertenece al segmento
-            if abs((d1 + d2) - d_total) < 2:  # margen de 2 metros
+            if abs((d1 + d2) - d_total) < 8:  # margen de 2 metros
                 cortes.append(inter)
 
         # Ordenar cortes por distancia
@@ -170,7 +177,7 @@ def dividir_segmentos_por_intersecciones(segmentos, intersecciones):
 
 
 # ============================================================
-# 7. Construcción del grafo final
+# 7. Construcción del grafo 
 # ============================================================
 
 def construir_grafo(ciclovias):
@@ -190,36 +197,21 @@ def construir_grafo(ciclovias):
         nodes[id_start] = start
         nodes[id_end] = end
 
-    # -------------------------------
-    # 1. Snapping / Merge nodos
-    # -------------------------------
+    
     merged_nodes, mapping = merge_close_nodes(nodes)
 
-    # -------------------------------
-    # 2. Detectar intersecciones
-    # -------------------------------
+
     segmentos, inters = detectar_intersecciones(ciclovias)
 
-    # -------------------------------
-    # 3. Cortar segmentos por intersecciones
-    # -------------------------------
     segmentos_finales = dividir_segmentos_por_intersecciones(segmentos, inters)
 
-    # -------------------------------
-    # 4. Agregar intersecciones al merge de nodos
-    # -------------------------------
     for inter in inters:
         id_inter = f"{inter[0]},{inter[1]}"
         merged_nodes[id_inter] = inter
 
-    # -------------------------------
-    # 5. Crear grafo vacío
-    # -------------------------------
+    
     graph = {nid: {} for nid in merged_nodes}
 
-    # -------------------------------
-    # 6. Crear aristas del grafo
-    # -------------------------------
     for p1, p2 in segmentos_finales:
         id1 = f"{p1[0]},{p1[1]}"
         id2 = f"{p2[0]},{p2[1]}"
@@ -235,9 +227,7 @@ def construir_grafo(ciclovias):
             graph[id1][id2] = dist
             graph[id2][id1] = dist
 
-    # -------------------------------
-    # 7. Retornar grafo listo
-    # -------------------------------
+   
     return graph, merged_nodes
 
 
@@ -250,7 +240,7 @@ Base.metadata.create_all(bind=engine)
 # =====================================================
 # FASTAPI
 # =====================================================
-app = FastAPI(title="API PathCycle 🚴‍♀️")
+app = FastAPI(title="API PathCycle ")
 
 # =====================================================
 # CORS
@@ -274,7 +264,7 @@ app.add_middleware(
 # =====================================================
 @app.get("/")
 def root():
-    return {"mensaje": "API de PathCycle 🚴‍♂️ funcionando con Ciclovias_Staging"}
+    return {"mensaje": "API de PathCycle  funcionando con Ciclovias_Staging"}
 
 # =====================================================
 # CICLOVÍAS
@@ -687,24 +677,21 @@ def ruta_optima(
     lon_fin: float,
     db: Session = Depends(get_db)
 ):
-    # 1. Traer ciclovías desde la BD
+
+    # 1. Traer ciclovías
     ciclovias = db.query(Ciclovia).all()
 
-    # 2. Detectar intersecciones reales
+    # 2. Intersecciones reales
     segmentos_originales, intersecciones = detectar_intersecciones(ciclovias)
 
-    # 3. Cortar los segmentos en cada punto de cruce
+    # 3. Cortar los segmentos
     segmentos_divididos = dividir_segmentos_por_intersecciones(
         segmentos_originales,
         intersecciones
     )
 
-    # 4. Reconstruir grafo usando segmentos divididos
-    #    IMPORTANTE: construir_grafo usa Ciclovia, así que lo adaptamos aquí
+    # 4. Reconstruir grafo base
     nodes = {}
-    graph = {}
-
-    # Crear nodos únicos
     for s in segmentos_divididos:
         p1, p2 = s
         id1 = f"{p1[0]},{p1[1]}"
@@ -712,50 +699,485 @@ def ruta_optima(
         nodes[id1] = p1
         nodes[id2] = p2
 
-    # Unificar nodos cercanos
     merged_nodes, mapping = merge_close_nodes(nodes)
 
-    # Construir grafo vacío
+    # Crear grafo vacío
     graph = {nid: {} for nid in merged_nodes.keys()}
 
     # Agregar aristas
     for s in segmentos_divididos:
         p1, p2 = s
-
-        id1 = mapping[f"{p1[0]},{p1[1]}"]
-        id2 = mapping[f"{p2[0]},{p2[1]}"]
+        id1 = mapping.get(f"{p1[0]},{p1[1]}", f"{p1[0]},{p1[1]}")
+        id2 = mapping.get(f"{p2[0]},{p2[1]}", f"{p2[0]},{p2[1]}")
 
         if id1 == id2:
             continue
 
-        dist = haversine(merged_nodes[id1], merged_nodes[id2])
+        coord1 = merged_nodes[id1]  # (lon,lat)
+        coord2 = merged_nodes[id2]
+
+        dist = haversine((coord1[1], coord1[0]), (coord2[1], coord2[0]))
+
         graph[id1][id2] = dist
         graph[id2][id1] = dist
 
-    # 5. Buscar nodo más cercano al punto inicial
-    start = min(
-        merged_nodes.keys(),
-        key=lambda n: haversine((lon_inicio, lat_inicio), merged_nodes[n])
-    )
+    # 5. Buscar nodos más cercanos
+    def nearest_node(latp, lonp):
+        best = None
+        best_d = float("inf")
+        for nid, coord in merged_nodes.items():
+            d = haversine((latp, lonp), (coord[1], coord[0]))
+            if d < best_d:
+                best = nid
+                best_d = d
+        return best, best_d
 
-    # 6. Buscar nodo más cercano al punto final
-    end = min(
-        merged_nodes.keys(),
-        key=lambda n: haversine((lon_fin, lat_fin), merged_nodes[n])
-    )
+    start, start_dist = nearest_node(lat_inicio, lon_inicio)
+    end, end_dist = nearest_node(lat_fin, lon_fin)
 
-    # 7. Ejecutar Dijkstra
+    # 6. Detectar componentes
+    def connected_components(g):
+        seen = set()
+        comps = []
+        for nid in g:
+            if nid in seen:
+                continue
+            stack = [nid]
+            comp = set()
+            while stack:
+                u = stack.pop()
+                if u not in comp:
+                    comp.add(u)
+                    seen.add(u)
+                    stack.extend(g[u].keys())
+            comps.append(comp)
+        return comps
+
+    comps = connected_components(graph)
+
+    comp_of = {}
+    for idx, comp in enumerate(comps):
+        for n in comp:
+            comp_of[n] = idx
+
+    start_comp = comp_of.get(start, None)
+    end_comp = comp_of.get(end, None)
+
+    # 7. Si están en componentes separadas → intentar unirlas
+    if start_comp is not None and end_comp is not None and start_comp != end_comp:
+
+        comp_A = comps[start_comp]
+        comp_B = comps[end_comp]
+
+        min_pair = None
+        min_d = float("inf")
+
+        for a in comp_A:
+            for b in comp_B:
+                ca = merged_nodes[a]
+                cb = merged_nodes[b]
+                d = haversine((ca[1], ca[0]), (cb[1], cb[0]))
+                if d < min_d:
+                    min_d = d
+                    min_pair = (a, b)
+
+        bridge_threshold = 60  # metros
+
+        if min_d <= bridge_threshold:
+            a, b = min_pair
+            graph[a][b] = min_d
+            graph[b][a] = min_d
+        else:
+            # 🔴 CASO FINAL: NO EXISTE CONEXIÓN
+            return {
+                "error": "No existe ruta conectada entre esos puntos",
+                "start_dist_m": start_dist,
+                "end_dist_m": end_dist,
+                "start_id": start,
+                "end_id": end
+            }
+
+    # 8. Ejecutar Dijkstra
     path, dist = dijkstra(graph, start, end)
 
     if not path:
-        return {"error": "No existe ruta conectada entre esos puntos"}
+        return {
+            "error": "No existe ruta conectada entre esos puntos",
+            "start_id": start,
+            "end_id": end
+        }
 
-    # 8. Convertir IDs en coordenadas
-    coords = [merged_nodes[p] for p in path]
+    # 9. Construir coordenadas finales
+    coords = [merged_nodes[n] for n in path]
 
     return {
-        "inicio_nodo": start,
-        "fin_nodo": end,
+        "inicio_nodo": {"lon": merged_nodes[start][0], "lat": merged_nodes[start][1]},
+        "fin_nodo": {"lon": merged_nodes[end][0], "lat": merged_nodes[end][1]},
         "distance_m": dist,
         "path_coords": coords
     }
+
+
+
+
+
+# ----------------------------
+# Helpers: parse fechas y filtros
+# ----------------------------
+def parse_date_str(s: str):
+    """Permite 'YYYYMMDD' o 'YYYY-MM-DD'"""
+    if not s:
+        return None
+    s = s.strip()
+    if "-" in s:
+        try:
+            return datetime.fromisoformat(s)
+        except:
+            return None
+    else:
+        # YYYYMMDD
+        try:
+            return datetime.strptime(s, "%Y%m%d")
+        except:
+            return None
+
+def apply_district_filter(queryset, districts):
+    if not districts:
+        return queryset
+    lowered = [d.strip().lower() for d in districts if d and d.strip()]
+    return [r for r in queryset if getattr(r, "DISTRITO_CICLOVIA", getattr(r, "distrito", "")).lower() in lowered]
+
+# ----------------------------
+# Reutiliza las funciones de grafo/metrics ya definidas
+# ----------------------------
+def compute_metrics(db: Session):
+    # reutiliza lógica de /metrics pero devuelve estructura python directamente
+    import networkx as nx
+    G = nx.Graph()
+    for c in db.query(Ciclovia).all():
+        n_c = f"ciclovia_{c.id}"
+        n_d = f"distrito_{c.DISTRITO_CICLOVIA}"
+        G.add_node(n_c, tipo="ciclovia")
+        G.add_node(n_d, tipo="distrito")
+        G.add_edge(n_c, n_d)
+    components = list(nx.connected_components(G))
+    if components:
+        main_component = max(components, key=len)
+    else:
+        main_component = set()
+    num_nodes = len(G.nodes)
+    num_edges = len(G.edges)
+    densidad = 0
+    if num_nodes > 1:
+        densidad = round((2 * num_edges) / (num_nodes * (num_nodes - 1)), 4)
+    return {
+        "total_nodes": num_nodes,
+        "total_edges": num_edges,
+        "components_count": len(components),
+        "largest_component_size": len(main_component),
+        "largest_component_percent": round(len(main_component) / num_nodes, 3) if num_nodes else 0,
+        "density": densidad
+    }
+
+def build_network_data(db: Session, districts: Optional[list] = None):
+    """Construye nodes/links combinando ciclovias, accidentes y trafico (puedes filtrar por districts)."""
+    ciclovias = db.query(Ciclovia).all()
+    accidentes = db.query(ReporteAccidente).all()
+    trafico = db.query(Trafico).all()
+
+    if districts:
+        # filtrar
+        ciclovias = apply_district_filter(ciclovias, districts)
+        accidentes = [a for a in accidentes if a.distrito.lower() in [d.lower() for d in districts]]
+        trafico = [t for t in trafico if t.distrito.lower() in [d.lower() for d in districts]]
+
+    nodes = []
+    links = []
+
+    for c in ciclovias:
+        nodes.append({
+            "id": f"ciclovia_{c.id}",
+            "label": c.NOMBRE_CICLOVIA,
+            "type": "ciclovia",
+            "distrito": c.DISTRITO_CICLOVIA,
+            "longitud_km": c.LONGITUD_KM
+        })
+        links.append({"source": f"ciclovia_{c.id}", "target": f"distrito_{c.DISTRITO_CICLOVIA}", "value": 1})
+
+    for a in accidentes:
+        nodes.append({
+            "id": f"accidente_{a.id}",
+            "label": a.tipo_accidente,
+            "type": "accidente",
+            "distrito": a.distrito,
+            "heridos": a.numero_heridos,
+            "fallecidos": a.numero_fallecidos
+        })
+        links.append({"source": f"accidente_{a.id}", "target": f"distrito_{a.distrito}", "value": 1})
+
+    for t in trafico:
+        nodes.append({
+            "id": f"trafico_{t.id}",
+            "label": t.intensidad_trafico,
+            "type": "trafico",
+            "distrito": t.distrito,
+            "velocidad": t.velocidad_promedio
+        })
+        links.append({"source": f"trafico_{t.id}", "target": f"distrito_{t.distrito}", "value": 1})
+
+    # distritos
+    distritos = set(
+        [c.DISTRITO_CICLOVIA for c in ciclovias] +
+        [a.distrito for a in accidentes] +
+        [t.distrito for t in trafico]
+    )
+    for d in distritos:
+        nodes.append({"id": f"distrito_{d}", "label": d, "type": "distrito"})
+
+    # eliminar duplicados por id (mantener último)
+    unique = {}
+    for n in nodes:
+        unique[n["id"]] = n
+    nodes = list(unique.values())
+
+    return {"nodes": nodes, "links": links}
+
+# ----------------------------
+# HTML builder (simple, extensible)
+# ----------------------------
+def generate_report_html(options: ReportRequestSchema, db: Session):
+    # Data fetch
+    date_from = parse_date_str(options.date_from) if options.date_from else None
+    date_to = parse_date_str(options.date_to) if options.date_to else None
+    districts = options.districts
+
+    # Fetch filtered data (for simplicity, we filter on Python lists)
+    ciclovias = db.query(Ciclovia).all()
+    accidentes = db.query(ReporteAccidente).all()
+    trafico = db.query(Trafico).all()
+
+    if districts:
+        ciclovias = apply_district_filter(ciclovias, districts)
+        accidentes = [a for a in accidentes if a.distrito.lower() in [d.lower() for d in districts]]
+        trafico = [t for t in trafico if t.distrito.lower() in [d.lower() for d in districts]]
+
+    # Start HTML
+    html_parts = []
+    html_parts.append("<!doctype html><html><head><meta charset='utf-8'><title>Reporte PathCycle</title>")
+    # Basic styles for PDF
+    html_parts.append("""
+    <style>
+      body{font-family: Arial, Helvetica, sans-serif; margin:20px; color:#222}
+      h1,h2,h3{color:#0f766e}
+      table{border-collapse:collapse;width:100%; margin-bottom:16px}
+      th,td{border:1px solid #ddd;padding:8px;text-align:left}
+      .section{margin-bottom:28px}
+      .muted{color:#666;font-size:0.9em}
+    </style>
+    """)
+    html_parts.append("</head><body>")
+
+    # Header
+    html_parts.append(f"<h1>Reporte — {html.escape(options.report_type)}</h1>")
+    html_parts.append(f"<div class='muted'>Generado: {datetime.utcnow().isoformat()} UTC</div>")
+
+    # Resumen ejecutivo
+    if options.include_summary:
+        html_parts.append("<div class='section'><h2>Resumen ejecutivo</h2>")
+        total_ciclo = len(ciclovias)
+        total_acc = len(accidentes)
+        total_traf = len(trafico)
+        html_parts.append(f"<p>Total ciclovías analizadas: <strong>{total_ciclo}</strong></p>")
+        html_parts.append(f"<p>Total incidentes registrados: <strong>{total_acc}</strong></p>")
+        html_parts.append(f"<p>Total registros de tráfico: <strong>{total_traf}</strong></p>")
+        html_parts.append("</div>")
+
+    # Mapa general (en HTML insertamos un placeholder; el frontend puede renderizar Mapbox si quiere)
+    if options.include_maps:
+        html_parts.append("<div class='section'><h2>Mapa general</h2>")
+        html_parts.append("<p class='muted'>A continuación se incluye la geometría de inicio/fin de cada ciclovía. Renderiza este HTML en el frontend para mostrar un mapa interactivo (Mapbox/Leaflet).</p>")
+        # Lista de puntos (puedes convertirlo a GeoJSON si lo prefieres)
+        html_parts.append("<table><thead><tr><th>Id</th><th>Nombre</th><th>Distrito</th><th>Lat inicio</th><th>Lon inicio</th><th>Lat fin</th><th>Lon fin</th></tr></thead><tbody>")
+        for c in ciclovias:
+            html_parts.append(f"<tr><td>{c.id}</td><td>{html.escape(c.NOMBRE_CICLOVIA or '')}</td><td>{html.escape(c.DISTRITO_CICLOVIA or '')}</td><td>{c.lat_inicio or ''}</td><td>{c.lon_inicio or ''}</td><td>{c.lat_fin or ''}</td><td>{c.lon_fin or ''}</td></tr>")
+        html_parts.append("</tbody></table></div>")
+
+        # Mapas por distrito: resumen rápido
+        html_parts.append("<div class='section'><h3>Mapas por distrito (resumen)</h3>")
+        distr_counts = {}
+        for c in ciclovias:
+            d = c.DISTRITO_CICLOVIA or "N/A"
+            distr_counts[d] = distr_counts.get(d, 0) + 1
+        html_parts.append("<ul>")
+        for d, cnt in distr_counts.items():
+            html_parts.append(f"<li>{html.escape(d)}: {cnt} ciclovía(s)</li>")
+        html_parts.append("</ul></div>")
+
+    # Accidentes
+    if options.include_maps:
+        html_parts.append("<div class='section'><h2>Accidentes</h2>")
+        if accidentes:
+            html_parts.append("<table><thead><tr><th>Id</th><th>Distrito</th><th>Tipo</th><th>Heridos</th><th>Fallecidos</th><th>Fecha</th><th>Hora</th></tr></thead><tbody>")
+            for a in accidentes:
+                html_parts.append(f"<tr><td>{a.id}</td><td>{html.escape(a.distrito or '')}</td><td>{html.escape(a.tipo_accidente or '')}</td><td>{a.numero_heridos}</td><td>{a.numero_fallecidos}</td><td>{html.escape(str(a.fecha) or '')}</td><td>{html.escape(str(a.hora) or '')}</td></tr>")
+            html_parts.append("</tbody></table>")
+        else:
+            html_parts.append("<p>No hay registros de accidentes para los filtros aplicados.</p>")
+        html_parts.append("</div>")
+
+    # Tráfico
+    if options.include_maps:
+        html_parts.append("<div class='section'><h2>Tráfico</h2>")
+        if trafico:
+            html_parts.append("<table><thead><tr><th>Id</th><th>Distrito</th><th>Nivel</th><th>Velocidad</th><th>Horario</th><th>Fecha</th></tr></thead><tbody>")
+            for t in trafico:
+                html_parts.append(f"<tr><td>{t.id}</td><td>{html.escape(t.distrito or '')}</td><td>{html.escape(t.intensidad_trafico or '')}</td><td>{t.velocidad_promedio}</td><td>{html.escape(t.hora_pico or '')}</td><td>{html.escape(str(t.fecha) or '')}</td></tr>")
+            html_parts.append("</tbody></table>")
+        else:
+            html_parts.append("<p>No hay registros de tráfico para los filtros aplicados.</p>")
+        html_parts.append("</div>")
+
+    # Métricas algorítmicas
+    if options.include_metrics:
+        metrics = compute_metrics(db)
+        html_parts.append("<div class='section'><h2>Métricas algorítmicas</h2>")
+        html_parts.append("<table><tbody>")
+        for k, v in metrics.items():
+            html_parts.append(f"<tr><th style='width:40%'>{html.escape(str(k))}</th><td>{html.escape(str(v))}</td></tr>")
+        html_parts.append("</tbody></table></div>")
+
+    # Gráficos de conectividad (incluir tabla nodes/links)
+    if options.include_graph:
+        net = build_network_data(db, districts)
+        html_parts.append("<div class='section'><h2>Gráficos de conectividad</h2>")
+        html_parts.append("<p class='muted'>Se incluyen nodos y enlaces. Para visualizar en frontend: convierta a formato de su librería (D3/Force/Mapbox).</p>")
+        # Small summary
+        html_parts.append(f"<p>Nodos totales: {len(net['nodes'])} — Enlaces totales: {len(net['links'])}</p>")
+        # Incluir un JSON embebido (para facilitar render en frontend)
+        import json
+        html_parts.append("<pre style='max-height:300px;overflow:auto;background:#f6f8fa;padding:10px;border:1px solid #eee'>")
+        html_parts.append(html.escape(json.dumps(net, indent=2, ensure_ascii=False)))
+        html_parts.append("</pre></div>")
+
+    # Footer
+    html_parts.append("<div class='muted' style='margin-top:30px'>Reporte generado por PathCycle</div>")
+
+    html_parts.append("</body></html>")
+    return "".join(html_parts)
+
+# ----------------------------
+# Endpoint: preview
+# ----------------------------
+@app.post("/reports/preview")
+def reports_preview(payload: ReportRequestSchema = Body(...), db: Session = Depends(get_db)):
+    """
+    Genera el HTML del reporte según la configuración y lo devuelve.
+    El frontend puede mostrar el HTML en un iframe (srcDoc) para preview.
+    """
+    html_content = generate_report_html(payload, db)
+    return {"html": html_content}
+
+# ----------------------------
+# Endpoint: save report
+# ----------------------------
+
+
+@app.post("/reports/save", response_model=ReportSavedResponse)
+def reports_save(payload: SaveReportRequest, db: Session = Depends(get_db)):
+    try:
+        # 🔥 Decodificar HTML Base64
+        decoded_html = base64.b64decode(payload.html).decode("utf-8")
+    except:
+        decoded_html = payload.html  # si ya viene normal
+
+    r = ReportSaved(
+        title=payload.title,
+        html=decoded_html,
+        export_format=payload.export_format
+    )
+
+    db.add(r)
+    db.commit()
+    db.refresh(r)
+    return r
+
+# ----------------------------
+# Endpoint: recent reports
+# ----------------------------
+@app.get("/reports/recent", response_model=List[ReportSavedResponse])
+def reports_recent(limit: int = 10, db: Session = Depends(get_db)):
+    rows = db.query(ReportSaved).order_by(ReportSaved.created_at.desc()).limit(limit).all()
+    return rows
+
+
+@app.get("/reports/download/{report_id}")
+def reports_download(report_id: int, db: Session = Depends(get_db)):
+    """
+    Devuelve el archivo del reporte (HTML o PDF) según el formato guardado.
+    """
+    r = db.query(ReportSaved).filter(ReportSaved.id == report_id).first()
+    if not r:
+        raise HTTPException(status_code=404, detail="Reporte no encontrado")
+
+    # =====================================
+    # 1) Decodificar HTML si está en Base64
+    # =====================================
+    html_content = r.html
+
+    try:
+        # Intenta decodificar Base64
+        html_content = base64.b64decode(html_content).decode("utf-8")
+    except Exception:
+        # Si falla, se asume que ya es texto normal
+        pass
+
+    # =====================================
+    # 2) HTML
+    # =====================================
+    if r.export_format == "html":
+        tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".html")
+        tmp.write(html_content.encode("utf-8"))
+        tmp.close()
+
+        return StreamingResponse(
+            open(tmp.name, "rb"),
+            media_type="text/html",
+            headers={
+                "Content-Disposition": f"attachment; filename=reporte_{report_id}.html",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Expose-Headers": "Content-Disposition",
+            }
+        )
+
+    # =====================================
+    # 3) PDF
+    # =====================================
+    elif r.export_format == "pdf":
+        tmp_html = tempfile.NamedTemporaryFile(delete=False, suffix=".html")
+        tmp_pdf = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
+
+        # Guardar HTML temporal
+        tmp_html.write(html_content.encode("utf-8"))
+        tmp_html.close()
+
+        # Convertir HTML → PDF
+        try:
+            pdfkit.from_file(tmp_html.name, tmp_pdf.name)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Error generando PDF: {str(e)}")
+
+        return StreamingResponse(
+            open(tmp_pdf.name, "rb"),
+            media_type="application/pdf",
+            headers={
+                "Content-Disposition": f"attachment; filename=reporte_{report_id}.pdf",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Expose-Headers": "Content-Disposition",
+            }
+        )
+
+    # =====================================
+    # 4) Formato inválido
+    # =====================================
+    else:
+        raise HTTPException(status_code=400, detail="Formato no soportado")

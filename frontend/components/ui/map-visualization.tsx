@@ -6,7 +6,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import type { Feature, LineString, FeatureCollection } from "geojson";
 
 mapboxgl.accessToken =
-  "pk.eyJ1IjoiaXRhbG83NTEiLCJhIjoiY21pOWJsN3ZxMGp3YzJxcHpnbDFveWhrNSJ9.38wcg6EhQeqr7IcWnRKvZA";
+  "pk.eyJ1IjoiaXRhbG83NTEiLCJhIjoiY21pams0b2N1MDVqNjNkcTM1b2t5emlybyJ9.C731zbdV6cUyaG25cn0e7Q";
 
 export interface MapVisualizationRef {
   zoomIn: () => void;

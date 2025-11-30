@@ -11,7 +11,6 @@ export default function Sidebar({ currentPage, onPageChange }: SidebarProps) {
   const navItems = [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
     { id: "network-analysis", label: "Análisis de Red", icon: Map },
-    { id: "simulator", label: "Simulador", icon: RotateCw },
     { id: "reports", label: "Reportes", icon: FileText },
     { id: "optimal-route", label: "Ruta Óptima", icon: Route },
     { id: "settings", label: "Configuración", icon: Settings },

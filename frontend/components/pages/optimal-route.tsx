@@ -101,11 +101,11 @@ export default function OptimalRoute() {
       );
 
       if (!ruta?.path_coords || ruta.path_coords.length < 2) {
-        alert("No se encontró una ruta válida.");
-        // si falla, vuelve a mostrar ciclovías
+        alert("No se ha encontrado ruta: estos dos tramos no tienen conexión ciclista.");
         mapRef.current?.showCycleways();
         return;
       }
+      
 
       console.log("Ruta óptima recibida:", ruta);
 

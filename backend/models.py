@@ -1,6 +1,8 @@
 # models.py
-from sqlalchemy import Column, String, Float, Integer, Date, Time
-from .database import Base  # Asegúrate de importar tu Base desde donde la defines
+from sqlalchemy import Column, String, Float, Integer, Date, Time, Text, DateTime
+from .database import Base
+from datetime import datetime
+
 
 class Ciclovia(Base):
     __tablename__ = "Ciclovias"
@@ -49,3 +51,13 @@ class Trafico(Base):
     velocidad_promedio = Column(Float)
     hora_pico = Column(String(50))
     fecha = Column(String(50))
+
+
+class ReportSaved(Base):
+    __tablename__ = "reports_saved"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    title = Column(String(255))
+    html = Column(Text)           # Guardamos HTML del reporte
+    export_format = Column(String(10), default="html")
+    created_at = Column(DateTime, default=datetime.utcnow)

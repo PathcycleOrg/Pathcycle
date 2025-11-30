@@ -1,4 +1,4 @@
-import { Ciclovia, ReporteAccidente, Trafico } from "./types";
+import { Ciclovia, ReporteAccidente, Trafico , PreviewConfig , ReporteItem } from "./types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -91,16 +91,25 @@ export async function fetchMetricasRed() {
 
 
 // ===========================
-// RUTA ÓPTIMA (Funciona con intersecciones reales)
+// RUTA ÓPTIMA (con manejo de errores del backend)
 // ===========================
 export async function fetchRutaOptima(
   inicio: { lon: number; lat: number },
   fin: { lon: number; lat: number }
 ): Promise<{
-  inicio_nodo: string;
-  fin_nodo: string;
-  distance_m: number;
-  path_coords: [number, number][]; // [lon, lat]
+  error?: string;
+
+  // datos extra cuando NO hay ruta
+  start_id?: string;
+  end_id?: string;
+  start_dist_m?: number;
+  end_dist_m?: number;
+
+  // datos cuando SÍ hay ruta
+  inicio_nodo?: { lon: number; lat: number };
+  fin_nodo?: { lon: number; lat: number };
+  distance_m?: number;
+  path_coords?: [number, number][]; // [lon, lat]
 }> {
 
   const params = new URLSearchParams({
@@ -115,15 +124,103 @@ export async function fetchRutaOptima(
   if (!res.ok) {
     const errorText = await res.text();
     console.error("Error en backend:", errorText);
-    throw new Error("Error obteniendo ruta óptima");
+    return { error: "Error obteniendo ruta óptima" };
   }
 
   const data = await res.json();
 
-  // Validación extra para evitar errores en drawRoute
-  if (!data.path_coords || !Array.isArray(data.path_coords)) {
-    throw new Error("Respuesta inválida del backend");
+  if (data.error) {
+    console.warn("Backend indica que no existe ruta:", data.error);
+    return {
+      error: data.error,
+      start_id: data.start_id,
+      end_id: data.end_id,
+      start_dist_m: data.start_dist_m,
+      end_dist_m: data.end_dist_m,
+    };
+  }
+
+  if (!Array.isArray(data.path_coords)) {
+    return { error: "Respuesta inválida del backend" };
   }
 
   return data;
+}
+
+
+
+// ====================================
+// REPORTES - DESCARGA DE ARCHIVO
+// ====================================
+export async function downloadReporte(reportId: number) {
+  const res = await fetch(`${API_URL}/reports/download/${reportId}`);
+
+  if (!res.ok) throw new Error("Error descargando el reporte");
+
+  const blob = await res.blob();
+
+  // Extraer nombre real del archivo desde 'Content-Disposition'
+  const disposition = res.headers.get("Content-Disposition");
+  let filename = "reporte_descargado";
+
+  if (disposition && disposition.includes("filename=")) {
+    filename = disposition.split("filename=")[1].replace(/"/g, "");
+  }
+
+  return { blob, filename };
+}
+
+
+
+// ====================================
+// REPORTES - GENERAR PREVIEW
+// ====================================
+export async function previewReporte(
+  config: PreviewConfig
+): Promise<string> {
+
+  const res = await fetch(`${API_URL}/reports/preview`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(config)
+  });
+
+  if (!res.ok) throw new Error("Error generando vista previa del reporte");
+
+  const data = await res.json();
+  return data.html;  // ✔ HTML REAL
+}
+
+
+// ====================================
+// REPORTES - GUARDAR REPORTE
+// ====================================
+export async function saveReporte(payload: {
+  title: string;
+  html: string;
+  export_format: "html" | "pdf";
+}) {
+  const res = await fetch(`${API_URL}/reports/save`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+
+  if (!res.ok) throw new Error("Error guardando reporte");
+
+  return res.json();
+}
+
+// ====================================
+// REPORTES - LISTA DE RECIENTES
+// ====================================
+export async function fetchReportesRecientes(
+  limit: number = 10
+): Promise<ReporteItem[]> {
+
+  const res = await fetch(`${API_URL}/reports/recent?limit=${limit}`);
+
+  if (!res.ok) throw new Error("Error obteniendo reportes recientes");
+
+  return res.json();
 }
